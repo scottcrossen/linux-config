@@ -1,0 +1,42 @@
+# i3status configuration file.
+# see "man i3status" for documentation.
+
+# It is important that this file is edited as UTF-8.
+# The following line should contain a sharp s:
+# ß
+# If the above line is not correctly displayed, fix your editor first!
+
+general {
+        colors = true
+        interval = 5
+}
+
+order += "volume main"
+order += "load"
+order += "ethernet enp0s31f6"
+order += "tztime utc"
+order += "tztime local"
+
+ethernet enp0s31f6 {
+        format_up = "ETHERNET: %speed"
+        format_down = ""
+}
+
+tztime local {
+        format = "%l:%M %m/%d/%Y"
+}
+
+load {
+        format = "LOAD: %1min"
+}
+
+volume main {
+	format = "VOLUME: %volume"
+	format_muted = "VOLUME: %volume (muted)"
+}
+
+tztime utc {
+    format = "%H:%M UTC"
+    timezone = "UTC"
+}
+

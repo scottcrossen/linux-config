@@ -1,0 +1,24 @@
+[ui]
+merge = meld
+editor = vim
+ignore = ~/.hgignore
+username = scottcrossen
+email = scottcrossen42@gmail.com
+
+[alias]
+l = ll -r "only(.,public()) and (user('$USER') or parents(user('$USER')))"
+xl = ll -r "sort(((parents(not public()) or (not public()) or children(not public())) and (not obsolete() or parents(unstable())) and (user('$USER') or parents(user('$USER')) or children(user('$USER')))) or ., -rev)"
+revert = revert --no-backup
+
+[extensions]
+hggit =
+strip =
+
+[hggit]
+usephases = True
+
+[git]
+initree = True
+
+[color]
+changeset.shortest = underline
