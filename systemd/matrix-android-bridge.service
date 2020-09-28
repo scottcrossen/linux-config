@@ -1,0 +1,26 @@
+[Unit]
+Description=Android emulator matrix bridge
+
+[Service]
+User=scottcrossen
+Environment=SHELL=/bin/bash
+Type=simple
+ExecStart=/usr/local/google/home/scottcrossen/Android/Sdk/emulator/emulator \
+			-avd matrix-bridge \
+			-netdelay none \
+			-netspeed full \
+			-camera-back webcam0 \
+			-no-audio \
+			-no-boot-anim \
+			-no-snapshot \
+			-no-window
+ExecStartPost=/usr/local/google/home/scottcrossen/Android/Sdk/platform-tools/adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]] ; do sleep 1; done; am start -n org.telegram.messenger/org.telegram.ui.LaunchActivity; am start -n com.whatsapp/com.whatsapp.Main'
+ExecStop=/usr/local/google/home/scottcrossen/Android/Sdk/platform-tools/adb -s matrix-bridge emu kill
+Restart=on-failure
+TimeoutStartSec=3600
+TimeoutStopSec=60
+RestartSec=30
+SyslogIdentifier=matrix-android-bridge
+
+[Install]
+WantedBy=multi-user.target
