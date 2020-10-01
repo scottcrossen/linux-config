@@ -2,17 +2,28 @@
 merge = meld
 editor = vim
 ignore = ~/.hgignore
-username = scottcrossen
-email = scottcrossen42@gmail.com
+username = Scott Leland Crossen <scottcrossen42@gmail.com>
+
+[templates]
+custom_compact =  '{label("log.changeset changeset.{phase}", shortest(node))} {ifeq(branch,"default","","{label('log.branch', branch)} ")}{label("grep.user", author|user)}{label("custom_compact.topic", if(topics," {topics}"))}{label("tags.normal", if(tags," {tags}"))}{label("custom_compact.book", if(bookmarks," {bookmarks}"))}\n{label(ifcontains(rev, revset('.'), 'desc.here'),desc|firstline)}\n'
 
 [alias]
+ll = log -G -T custom_compact
 l = ll -r "only(.,public()) and (user('$USER') or parents(user('$USER')))"
 xl = ll -r "sort(((parents(not public()) or (not public()) or children(not public())) and (not obsolete() or parents(unstable())) and (user('$USER') or parents(user('$USER')) or children(user('$USER')))) or ., -rev)"
 revert = revert --no-backup
 
 [extensions]
+hgext.bookmarks =
 hggit =
+evolve =
 strip =
+color =
+pager =
+
+[pager]
+pager = less -FRX
+attend = log,ll,xl,l,resolve
 
 [hggit]
 usephases = True
@@ -21,4 +32,36 @@ usephases = True
 initree = True
 
 [color]
-changeset.shortest = underline
+status.ignored = magenta bold
+status.modified = cyan
+status.added = green
+status.removed = red
+status.deleted = yellow bold underline
+status.unknown = magenta bold underline
+status.ignored = yellow underline
+status.copied = green underline
+desc.here = bold
+diff.diffline = none
+diff.extended = cyan
+diff.file_a = red
+diff.file_b = green
+diff.hunk = yellow bold
+diff.deleted = red
+diff.inserted = green
+diff.changed = white
+diff.trailingwhitespace = white_background
+bookmarks.current = magenta bold
+grep.user = yellow
+tags.normal = magenta bold
+log.tag = magenta bold
+log.bookmark = magenta bold
+log.branch = magenta bold
+log.date = green bold
+log.user = yellow
+log.manifest = green bold underline
+log.extra = yellow bold underline
+changeset.public = blue
+changeset.draft = green
+changeset.secret = red bold
+custom_compact.book = magenta bold
+custom_compact.topic = yellow bold
