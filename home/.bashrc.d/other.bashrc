@@ -36,3 +36,5 @@ if [ -d "$HOME/bin" ] ; then
 fi
 
 export PATH=$PATH:$HOME/.cargo/bin
+
+eval "$(minikube -p minikube docker-env)"

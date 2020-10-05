@@ -1,0 +1,18 @@
+[Unit]
+Description=Minikube
+
+[Service]
+User=scottcrossen
+Environment=SHELL=/bin/bash
+Type=simple
+RemainAfterExit=true
+ExecStart=minikube start
+ExecStop=minikube stop
+Restart=on-failure
+TimeoutStartSec=7200
+TimeoutStopSec=60
+RestartSec=60
+SyslogIdentifier=minikube
+
+[Install]
+WantedBy=multi-user.target
