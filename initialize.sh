@@ -1,16 +1,21 @@
 #!/bin/bash
 
-if [ "$EUID" -ne 0 ]
-  then echo "Please run as root"
-  exit
-fi
+# TODO: Cleanup stdout on most of this
 
+echo "Setting script variables"
 SCRIPT_DIR="${BASH_SOURCE%/*}"
 mkdir -p "$SCRIPT_DIR"/tmp
 cd "$SCRIPT_DIR"/tmp
+SCRIPT_DIR="$SCRIPT_DIR"/..
 
-apt update
-apt update && apt install -y \
+echo "Copying dotfiles"
+cp -r "$SCRIPT_DIR"/home/. ~
+sudo chmod +x ~/.bashrc.d
+sudo chmod +x ~/.bashrc
+
+echo "Installing basic packages"
+sudo apt-get update > /dev/null
+sudo apt-get update > /dev/null && sudo apt-get install -y \
     apt-transport-https \
     gnupg2 \
     curl \
@@ -20,40 +25,36 @@ apt update && apt install -y \
     software-properties-common \
     qemu-system \
     libvirt-clients \
-    libvirt-daemon-system
+    libvirt-daemon-system > /dev/null
 
-# Install chrome
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-apt install -y ./google-chrome-stable_current_amd64.deb
+echo "Installing Google Chrome"
+wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb > /dev/null
+sudo apt-get install -y ./google-chrome-stable_current_amd64.deb > /dev/null
 
-# Install git
-apt install git
+echo "Installing Git"
+sudo apt-get install git > /dev/null
 git config --global user.name "Scott Crossen"
 git config --global user.email "scottcrossen42@gmail.com"
 ssh-keygen -f ~/.ssh/id_rsa -q -N ""
 ssh-add ~/.ssh/id_rsa
-# TODO: automate adding id_rsa to GitHub
+echo "TODO: Remember to add public ssh key to GitHub"
 
-# Install bashrc
-cp -r "$SCRIPT_DIR"/home/. ~
-chmod +x ~/.bashrc.d
-chmod +x ~/.bashrc
-
-# Install docker
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | apt-key add -
-add-apt-repository \
+echo "Installing Docker"
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - > /dev/null &> /dev/null
+sudo add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/debian \
    $(lsb_release -cs) \
    stable"
-apt update && apt install -y docker-ce docker-ce-cli containerd.io
+sudo apt-get update > /dev/null && sudo apt-get install -y docker-ce docker-ce-cli containerd.io > /dev/null
 usermod -aG docker $USER && newgrp docker
+echo "TODO: Remeber to execute `docker login`"
 
-# Install Kubernetes
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add -
+echo "Installing Kubernetes"
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - > /dev/null &> /dev/null
 echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
-apt update && apt install -y kubectl
+sudo apt-get update > /dev/null && sudo apt-get install -y kubectl > /dev/null
 
-# Install minikube
+echo "Installing Minikube"
 adduser $USER libvirt
 curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
   && chmod +x minikube
@@ -62,6 +63,11 @@ install minikube /usr/local/bin/
 cp "$SCRIPT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
 systemctl daemon-reload
 
-# Install i3
-apt install i3
-update-alternatives --install /usr/bin/x-session-manager x-session-manager /usr/bin/i3 60
+echo "Installing I3"
+sudo apt-get install i3
+sudo update-alternatives --install /usr/bin/x-session-manager x-session-manager /usr/bin/i3 60
+
+echo "Installing Visual Studio Code"
+curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null &> /dev/null
+sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+sudo apt-get update > /dev/null && sudo apt-get install -y code > /dev/null
