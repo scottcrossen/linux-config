@@ -25,10 +25,13 @@ sudo apt-get update > /dev/null && sudo apt-get install -y \
     software-properties-common \
     qemu-system \
     libvirt-clients \
-    libvirt-daemon-system > /dev/null
+    libvirt-daemon-system \
+    xvfb \
+    xbase-clients \
+    python3-psutil > /dev/null
 
 echo "Installing Google Chrome"
-wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb > /dev/null
+curl -sSLo google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
 sudo apt-get install -y ./google-chrome-stable_current_amd64.deb > /dev/null
 
 echo "Installing Git"
@@ -40,7 +43,7 @@ ssh-add ~/.ssh/id_rsa
 echo "TODO: Remember to add public ssh key to GitHub"
 
 echo "Installing Docker"
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - > /dev/null &> /dev/null
+curl -sSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - > /dev/null &> /dev/null
 sudo add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/debian \
    $(lsb_release -cs) \
@@ -50,13 +53,13 @@ usermod -aG docker $USER && newgrp docker
 echo "TODO: Remeber to execute `docker login`"
 
 echo "Installing Kubernetes"
-curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - > /dev/null &> /dev/null
+curl -sSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - > /dev/null &> /dev/null
 echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get update > /dev/null && sudo apt-get install -y kubectl > /dev/null
 
 echo "Installing Minikube"
 adduser $USER libvirt
-curl -Lo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
   && chmod +x minikube
 mkdir -p /usr/local/bin/
 install minikube /usr/local/bin/
@@ -71,3 +74,10 @@ echo "Installing Visual Studio Code"
 curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null &> /dev/null
 sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
 sudo apt-get update > /dev/null && sudo apt-get install -y code > /dev/null
+
+echo "Installing Chrome Remote Desktop"
+curl -sSLo chrome-remote-desktop_current_amd64.deb https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb
+sudo dpkg --install chrome-remote-desktop_current_amd64.deb > /dev/null
+sudo apt install --assume-yes --fix-broken
+sudo echo "exec /etc/X11/Xsession /usr/bin/xfce4-session" > /etc/chrome-remote-desktop-session
+echo "TODO: Remember to add this computer to chrome remote desktop list"
