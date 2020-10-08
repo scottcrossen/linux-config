@@ -50,11 +50,11 @@ sudo add-apt-repository \
    stable"
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y docker-ce docker-ce-cli containerd.io > /dev/null
 sudo usermod -aG docker $USER
-echo "TODO: Remember to execute `docker login`"
+echo "TODO: Remember to login to docker"
 
 echo "Installing Kubernetes"
 curl -sSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - > /dev/null 2> /dev/null
-echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
+echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y kubectl > /dev/null
 
 echo "Installing Minikube"
@@ -63,7 +63,7 @@ curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/mini
   && chmod +x minikube
 mkdir -p /usr/local/bin/
 install minikube /usr/local/bin/
-cp "$SCRIPT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
+sudo cp "$SCRIPT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
 systemctl daemon-reload
 
 echo "Installing I3"
