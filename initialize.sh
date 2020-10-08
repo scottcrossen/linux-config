@@ -66,7 +66,7 @@ curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/mini
 mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
 sudo cp "$SCRIPT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
-systemctl daemon-reload
+sudo systemctl daemon-reload
 
 echo "Installing I3"
 sudo apt-get -qq install i3
