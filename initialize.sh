@@ -3,15 +3,16 @@
 # TODO: Cleanup stdout on most of this
 
 echo "Setting script variables"
-SCRIPT_DIR="${BASH_SOURCE%/*}"
-mkdir -p "$SCRIPT_DIR"/tmp
-cd "$SCRIPT_DIR"/tmp
-SCRIPT_DIR="$SCRIPT_DIR"/..
+SCRIPT_DIR="$(pwd)"/"${BASH_SOURCE%/*}"
+TEMP_DIR=$(mktemp -d)
+cd $TEMP_DIR
 
 echo "Copying dotfiles"
 cp -r "$SCRIPT_DIR"/home/. ~
 sudo chmod +x ~/.bashrc.d
 sudo chmod +x ~/.bashrc
+ETHERNET_INTERFACE=$(ip link show | grep -o 'en[^: ]\+')
+sed -i "s/#####/$ETHERNET_INTERFACE/g" ~/.config/i3status/config
 
 echo "Installing basic packages"
 sudo apt-get -qq update > /dev/null

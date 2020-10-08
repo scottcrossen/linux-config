@@ -13,11 +13,11 @@ general {
 
 order += "volume main"
 order += "load"
-order += "ethernet enp0s31f6"
+order += "ethernet #####"
 order += "tztime utc"
 order += "tztime local"
 
-ethernet enp0s31f6 {
+ethernet ##### {
         format_up = "ETHERNET: %speed"
         format_down = ""
 }
