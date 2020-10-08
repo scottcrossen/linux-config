@@ -49,7 +49,7 @@ sudo add-apt-repository \
    $(lsb_release -cs) \
    stable"
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y docker-ce docker-ce-cli containerd.io > /dev/null
-sudo usermod -aG docker $USER && newgrp docker
+sudo usermod -aG docker $USER
 echo "TODO: Remeber to execute `docker login`"
 
 echo "Installing Kubernetes"
