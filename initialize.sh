@@ -1,7 +1,5 @@
 #!/bin/bash
 
-# TODO: Cleanup stdout on most of this
-
 echo "Setting script variables"
 SCRIPT_DIR="$(pwd)"/"${BASH_SOURCE%/*}"
 TEMP_DIR=$(mktemp -d)
@@ -69,6 +67,7 @@ mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
 sudo cp "$SCRIPT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
 sudo systemctl daemon-reload
+sudo systemctl enable minikube.service
 
 echo "Installing I3"
 sudo apt-get -qq install i3
