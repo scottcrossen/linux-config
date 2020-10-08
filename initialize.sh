@@ -43,7 +43,7 @@ ssh-add ~/.ssh/id_rsa
 echo "TODO: Remember to add public ssh key to GitHub"
 
 echo "Installing Docker"
-curl -sSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - > /dev/null &> /dev/null
+curl -sSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - > /dev/null 2> /dev/null
 sudo add-apt-repository \
    "deb [arch=amd64] https://download.docker.com/linux/debian \
    $(lsb_release -cs) \
@@ -53,7 +53,7 @@ sudo usermod -aG docker $USER && newgrp docker
 echo "TODO: Remeber to execute `docker login`"
 
 echo "Installing Kubernetes"
-curl -sSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - > /dev/null &> /dev/null
+curl -sSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - > /dev/null 2> /dev/null
 echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | tee -a /etc/apt/sources.list.d/kubernetes.list
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y kubectl > /dev/null
 
@@ -71,7 +71,7 @@ sudo apt-get -qq install i3
 sudo update-alternatives --install /usr/bin/x-session-manager x-session-manager /usr/bin/i3 60
 
 echo "Installing Visual Studio Code"
-curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null &> /dev/null
+curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null 2> /dev/null
 sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y code > /dev/null
 
