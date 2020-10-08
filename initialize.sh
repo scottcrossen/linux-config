@@ -50,7 +50,7 @@ sudo add-apt-repository \
    stable"
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y docker-ce docker-ce-cli containerd.io > /dev/null
 sudo usermod -aG docker $USER
-echo "TODO: Remeber to execute `docker login`"
+echo "TODO: Remember to execute `docker login`"
 
 echo "Installing Kubernetes"
 curl -sSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - > /dev/null 2> /dev/null
