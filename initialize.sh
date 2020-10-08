@@ -83,5 +83,5 @@ curl -sSLo chrome-remote-desktop_current_amd64.deb https://dl.google.com/linux/d
 sudo dpkg --install chrome-remote-desktop_current_amd64.deb > /dev/null
 sudo apt-get -qq install --assume-yes --fix-broken
 sudo touch /etc/chrome-remote-desktop-session
-sudo echo "exec /etc/X11/Xsession /usr/bin/xfce4-session" > /etc/chrome-remote-desktop-session
+sudo bash -c 'echo "exec /etc/X11/Xsession /usr/bin/xfce4-session" > /etc/chrome-remote-desktop-session'
 echo "TODO: Remember to add this computer to chrome remote desktop list"
