@@ -50,7 +50,8 @@ sudo add-apt-repository \
    stable"
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y docker-ce docker-ce-cli containerd.io > /dev/null
 sudo usermod -aG docker $USER
-echo "TODO: Remember to login to docker"
+echo "Logging into docker"
+docker login
 
 echo "Installing Kubernetes"
 curl -sSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - > /dev/null 2> /dev/null
@@ -80,6 +81,7 @@ sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y code > /dev/n
 echo "Installing Chrome Remote Desktop"
 curl -sSLo chrome-remote-desktop_current_amd64.deb https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb
 sudo dpkg --install chrome-remote-desktop_current_amd64.deb > /dev/null
-sudo apt install --assume-yes --fix-broken
+sudo apt-get -qq install --assume-yes --fix-broken
+sudo touch /etc/chrome-remote-desktop-session
 sudo echo "exec /etc/X11/Xsession /usr/bin/xfce4-session" > /etc/chrome-remote-desktop-session
 echo "TODO: Remember to add this computer to chrome remote desktop list"
