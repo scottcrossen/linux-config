@@ -17,19 +17,19 @@ sed -i "s/#####/$ETHERNET_INTERFACE/g" ~/.config/i3status/config
 echo "Installing basic packages"
 sudo apt-get -qq update > /dev/null
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y \
-    apt-transport-https \
-    gnupg2 \
-    curl \
-    vim \
-    ca-certificates \
-    gnupg-agent \
-    software-properties-common \
-    qemu-system \
-    libvirt-clients \
-    libvirt-daemon-system \
-    xvfb \
-    xbase-clients \
-    python3-psutil > /dev/null
+  apt-transport-https \
+  gnupg2 \
+  curl \
+  vim \
+  ca-certificates \
+  gnupg-agent \
+  software-properties-common \
+  qemu-system \
+  libvirt-clients \
+  libvirt-daemon-system \
+  xvfb \
+  xbase-clients \
+  python3-psutil > /dev/null
 
 echo "Installing Google Chrome"
 curl -sSLo google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
@@ -46,9 +46,9 @@ echo "TODO: Remember to add public ssh key to GitHub"
 echo "Installing Docker"
 curl -sSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - > /dev/null 2> /dev/null
 sudo add-apt-repository \
-   "deb [arch=amd64] https://download.docker.com/linux/debian \
-   $(lsb_release -cs) \
-   stable"
+  "deb [arch=amd64] https://download.docker.com/linux/$(lsb_release -is | awk '{print tolower($0)}') \
+  $(lsb_release -cs) \
+  stable"
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y docker-ce docker-ce-cli containerd.io > /dev/null
 sudo usermod -aG docker $USER
 echo "Logging into docker"
@@ -57,7 +57,7 @@ docker login
 echo "Installing Kubernetes"
 curl -sSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - > /dev/null 2> /dev/null
 if ! grep -q "xenial" /etc/apt/sources.list.d/kubernetes.list; then
-    echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list > /dev/null
+  echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list > /dev/null
 fi
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y kubectl > /dev/null
 
