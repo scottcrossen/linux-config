@@ -87,3 +87,12 @@ sudo apt-get -qq install --assume-yes --fix-broken
 sudo touch /etc/chrome-remote-desktop-session
 sudo bash -c 'echo "exec /etc/X11/Xsession /usr/bin/xfce4-session" > /etc/chrome-remote-desktop-session'
 echo "TODO: Remember to add this computer to chrome remote desktop list"
+
+echo "Installing Golang"
+curl -sSLO https://storage.googleapis.com/golang/go1.12.9.linux-amd64.tar.gz
+tar -xvf go1.12.9.linux-amd64.tar.gz
+sudo chown -R root:root ./go
+sudo mv go /usr/local
+
+echo "Installing Rust"
+curl -sSL --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
