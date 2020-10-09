@@ -37,7 +37,8 @@ echo "Installing Git"
 sudo apt-get -qq install git > /dev/null
 git config --global user.name "Scott Crossen"
 git config --global user.email "scottcrossen42@gmail.com"
-git config --global url."ssh://git@stash.teslamotors.com:7999/".insteadOf "https://stash.teslamotors.com/" 
+git config --global url."ssh://git@stash.teslamotors.com:7999/".insteadOf "https://stash.teslamotors.com/scm/"
+git config --global url."git@stash.teslamotors.com:7999".insteadOf "https://stash.teslamotors.com/"
 ssh-keygen -f ~/.ssh/id_rsa -q -N ""
 ssh-add ~/.ssh/id_rsa
 echo "TODO: Remember to add public ssh key to GitHub"
