@@ -74,8 +74,8 @@ sudo apt-get -qq install i3
 sudo update-alternatives --install /usr/bin/x-session-manager x-session-manager /usr/bin/i3 60
 
 echo "Installing Visual Studio Code"
-curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null 2> /dev/null
-sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+# curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null 2> /dev/null
+# sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y code > /dev/null
 
 echo "Installing Chrome Remote Desktop"
