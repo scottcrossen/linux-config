@@ -4,6 +4,13 @@ echo "Setting script variables"
 SCRIPT_DIR="$(pwd)"/"${BASH_SOURCE%/*}"
 TEMP_DIR=$(mktemp -d)
 cd $TEMP_DIR
+ARCH=""
+if [[ $(uname -m) = x86_64 ]]; then
+  ARCH="amd64"
+else 
+  echo "Unknown architecture \"$(uname -m)\""
+  exit
+fi
 
 echo "Copying dotfiles"
 cp -r "$SCRIPT_DIR"/home/. ~
@@ -30,8 +37,8 @@ sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y \
   python3-psutil > /dev/null
 
 echo "Installing Google Chrome"
-curl -sSLo google-chrome-stable_current_amd64.deb https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-sudo apt-get -qq install -y ./google-chrome-stable_current_amd64.deb > /dev/null
+curl -sSLo google-chrome-stable_current_$ARCH.deb https://dl.google.com/linux/direct/google-chrome-stable_current_$ARCH.deb
+sudo apt-get -qq install -y ./google-chrome-stable_current_$ARCH.deb > /dev/null
 
 echo "Installing Git"
 sudo apt-get -qq install git > /dev/null
@@ -46,7 +53,7 @@ echo "TODO: Remember to add public ssh key to GitHub"
 echo "Installing Docker"
 curl -sSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - > /dev/null 2> /dev/null
 sudo add-apt-repository \
-  "deb [arch=amd64] https://download.docker.com/linux/$(lsb_release -is | awk '{print tolower($0)}') \
+  "deb [arch=$ARCH] https://download.docker.com/linux/$(lsb_release -is | awk '{print tolower($0)}') \
   $(lsb_release -cs) \
   stable"
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y docker-ce docker-ce-cli containerd.io > /dev/null
@@ -63,7 +70,7 @@ sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y kubectl > /de
 
 echo "Installing Minikube"
 sudo adduser $USER libvirt
-curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64 \
+curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-$ARCH \
   && chmod +x minikube
 mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
@@ -78,23 +85,23 @@ sudo update-alternatives --install /usr/bin/x-session-manager x-session-manager 
 
 echo "Installing Visual Studio Code"
 # curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null 2> /dev/null
-# sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+# sudo add-apt-repository "deb [arch=$ARCH] https://packages.microsoft.com/repos/vscode stable main"
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y code > /dev/null
 
 echo "Installing Chrome Remote Desktop"
-curl -sSLo chrome-remote-desktop_current_amd64.deb https://dl.google.com/linux/direct/chrome-remote-desktop_current_amd64.deb
-sudo dpkg --install chrome-remote-desktop_current_amd64.deb > /dev/null
+curl -sSLO https://dl.google.com/linux/direct/chrome-remote-desktop_current_$ARCH.deb
+sudo dpkg --install chrome-remote-desktop_current_$ARCH.deb > /dev/null
 sudo apt-get -qq install --assume-yes --fix-broken
 sudo touch /etc/chrome-remote-desktop-session
 sudo bash -c 'echo "exec /etc/X11/Xsession /usr/bin/xfce4-session" > /etc/chrome-remote-desktop-session'
 echo "TODO: Remember to add this computer to chrome remote desktop list"
 
 echo "Installing Golang"
-# TODO: get current package
-curl -sSLO https://storage.googleapis.com/golang/go1.12.9.linux-amd64.tar.gz
-tar -xvf go1.12.9.linux-amd64.tar.gz
-sudo chown -R root:root ./go
-sudo mv go /usr/local
+VERSION_REGEX='\"version\":\s*\"([^"]*)\"'
+[[ $(curl -sSL 'https://golang.org/dl/?mode=json') =~ $VERSION_REGEX ]]
+CURRENT_VERSION="${BASH_REMATCH[1]}"
+curl -sSLO https://dl.google.com/go/$CURRENT_VERSION.linux-$ARCH.tar.gz
+tar -C /usr/local -xzf $CURRENT_VERSION.linux-$ARCH.tar.gz
 
 echo "Installing Rust"
 curl -sSL --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
