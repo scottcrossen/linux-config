@@ -65,6 +65,7 @@ curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/mini
   && chmod +x minikube
 mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
+# TODO: systemd files need to have their username re-mapped to the current.
 sudo cp "$SCRIPT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
 sudo systemctl daemon-reload
 sudo systemctl enable minikube.service
