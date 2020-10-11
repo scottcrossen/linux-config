@@ -21,7 +21,7 @@ sed -i "s/#####/$ETHERNET_INTERFACE/g" ~/.config/i3status/config
 
 echo "Installing basic packages"
 sudo apt-get -qq update > /dev/null
-sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y \
+sudo apt-get -qq install -y \
   apt-transport-https \
   gnupg2 \
   curl \
@@ -109,4 +109,5 @@ curl -sSL --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
 echo "Install Ansible"
 sudo apt-add-repository --yes --update ppa:ansible/ansible
+sudo apt-get -qq update > /dev/null
 sudo apt-get -qq install -y ansible
