@@ -107,6 +107,6 @@ tar -C /usr/local -xzf $CURRENT_VERSION.linux-$ARCH.tar.gz
 echo "Installing Rust"
 curl -sSL --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
 
-echo "Install ansible"
+echo "Install Ansible"
 sudo apt-add-repository --yes --update ppa:ansible/ansible
 sudo apt-get -qq install -y ansible
