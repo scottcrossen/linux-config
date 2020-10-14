@@ -170,3 +170,7 @@ bindsym $mod+c exec google-chrome-stable
 bindsym Super_L exec arandr
 
 exec --no-startup-id xset s off
+exec --no-startup-id google-chrome-stable https://music.youtube.com/
+exec --no-startup-id code
+assign [class="Google-chrome"] 1
+assign [class="Code"] 2
