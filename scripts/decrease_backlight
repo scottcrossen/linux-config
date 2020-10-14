@@ -1,0 +1,3 @@
+#!/bin/bash
+
+list_backlight | xargs -n1 brightnessctl set "${1:-5}"%- -d

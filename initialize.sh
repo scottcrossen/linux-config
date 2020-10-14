@@ -3,6 +3,7 @@
 echo "Setting script variables"
 SCRIPT_DIR="$(pwd)"/"${BASH_SOURCE%/*}"
 TEMP_DIR=$(mktemp -d)
+USER=scottcrossen
 cd $TEMP_DIR
 ARCH=""
 if [[ $(uname -m) = x86_64 ]]; then
@@ -12,12 +13,28 @@ else
   exit
 fi
 
+echo "Creating user and switching over"
+sudo useradd -m $USER
+sudo usermod -aG video $USER
+sudo usermod -aG libvert $USER
+sudo usermod -aG sudo $USER
+sudo su - $USER
+echo "Setting user password"
+passwd
+
 echo "Copying dotfiles"
 cp -r "$SCRIPT_DIR"/home/. ~
 sudo chmod +x ~/.bashrc.d
 sudo chmod +x ~/.bashrc
 ETHERNET_INTERFACE=$(ip link show | grep -o 'en[^: ]\+')
 sed -i "s/#####/$ETHERNET_INTERFACE/g" ~/.config/i3status/config
+
+echo "Copying udev files"
+sudo cp -r "$SCRIPT_DIR"/udev/. /etc/udev/rules.d
+sudo udevadm control --reload-rules && udevadm trigger
+
+echo "Copying scripts"
+sudo cp -r "$SCRIPT_DIR"/scripts/. /usr/local/bin
 
 echo "Installing basic packages"
 sudo apt-get -qq update > /dev/null
@@ -34,7 +51,9 @@ sudo apt-get -qq install -y \
   libvirt-daemon-system \
   xvfb \
   xbase-clients \
-  python3-psutil > /dev/null
+  python3-psutil \
+  arandr \
+  brightnessctl > /dev/null
 
 echo "Installing Google Chrome"
 curl -sSLo google-chrome-stable_current_$ARCH.deb https://dl.google.com/linux/direct/google-chrome-stable_current_$ARCH.deb
