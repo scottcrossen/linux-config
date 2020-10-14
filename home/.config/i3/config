@@ -165,12 +165,17 @@ bindsym XF86MonBrightnessDown exec decrease_backlight
 bindsym mod4+mod1+p exec present
 bindsym mod4+p exec present extend
 
-bindsym $mod+t exec vivaldi-stable
 bindsym $mod+c exec google-chrome-stable
 bindsym Super_L exec arandr
 
 exec --no-startup-id xset s off
-exec --no-startup-id google-chrome-stable --new-window https://music.youtube.com/
+exec --no-startup-id i3-msg 'workspace 3; exec i3-sensible-terminal; workspace 1'
+exec --no-startup-id google-chrome-stable --new-window --app=https://music.youtube.com/
+exec --no-startup-id google-chrome-stable --new-window --app=https://mail.google.com/mail/u/0/#inbox
+exec --no-startup-id google-chrome-stable --new-window --app=https://app.element.io/
+exec --no-startup-id google-chrome-stable --new-window
 exec --no-startup-id code
-assign [class="Google-chrome" instance="google-chrome"] 1
+assign [class="Google-chrome" instance="music.youtube.com"] 7
+assign [class="Google-chrome" instance="mail.google.com__mail_u_0"] 8
+assign [class="Google-chrome" instance="app.element.io"] 8
 assign [class="Code"] 2
