@@ -28,6 +28,7 @@ sudo chmod +x ~/.bashrc.d
 sudo chmod +x ~/.bashrc
 ETHERNET_INTERFACE=$(ip link show | grep -o 'en[^: ]\+')
 sed -i "s/#####/$ETHERNET_INTERFACE/g" ~/.config/i3status/config
+sudo chmod +x ~/.xprofile
 
 echo "Copying udev files"
 sudo cp -r "$SCRIPT_DIR"/udev/. /etc/udev/rules.d
@@ -53,7 +54,12 @@ sudo apt-get -qq install -y \
   xbase-clients \
   python3-psutil \
   arandr \
-  brightnessctl > /dev/null
+  brightnessctl \
+  lightdm > /dev/null
+
+echo "Configuring screens"
+arandr
+sudo chmod +x ~/.screenlayout/*
 
 echo "Installing Google Chrome"
 curl -sSLo google-chrome-stable_current_$ARCH.deb https://dl.google.com/linux/direct/google-chrome-stable_current_$ARCH.deb
@@ -102,6 +108,7 @@ sudo systemctl enable minikube.service
 echo "Installing I3"
 sudo apt-get -qq install i3
 sudo update-alternatives --install /usr/bin/x-session-manager x-session-manager /usr/bin/i3 60
+sudo dpkg-reconfigure lightdm
 
 echo "Installing Visual Studio Code"
 # curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null 2> /dev/null
