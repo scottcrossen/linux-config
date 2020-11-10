@@ -20,8 +20,8 @@ floating_modifier $mod
 # custom key bindings
 bindsym $mod+q kill
 bindsym $mod+F4 kill
-bindsym $mod+w exec "cinnamon-screensaver-command --lock"
-bindsym $mod+Shift+w exec "cinnamon-screensaver-command --lock"
+bindsym $mod+w exec i3lock -i $(gsettings get org.gnome.desktop.background picture-uri | sed -e "s/^'file:\/\///" -e "s/'$//")
+bindsym $mod+Shift+w exec i3lock -i $(gsettings get org.gnome.desktop.background picture-uri | sed -e "s/^'file:\/\///" -e "s/'$//") && systemctl suspend
 
 # start a terminal
 bindsym $mod+Return exec i3-sensible-terminal

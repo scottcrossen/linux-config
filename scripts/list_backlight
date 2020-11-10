@@ -1,3 +1,4 @@
 #!/bin/bash
+#author scottcrossen
 
 brightnessctl -l | grep 'backlight' | sed -e "s/Device\\s'\([^']*\)'[^$]*$/\1/"

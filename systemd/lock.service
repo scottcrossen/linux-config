@@ -1,0 +1,14 @@
+[Unit]
+Description=Lock the screen on resume
+Before=sleep.target suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target
+
+[Service]
+User=###USER###
+Type=forking
+Environment=DISPLAY=:0
+ExecStart=/bin/bash -xc '/usr/bin/i3lock -i $(/usr/bin/gsettings get org.gnome.desktop.background picture-uri | /usr/bin/sed -e "s|^\'file://||" -e "s|\'$||")'
+ExecStartPost=/usr/bin/sleep 1
+
+[Install]
+WantedBy=sleep.target suspend.target hibernate.target hybrid-sleep.target suspend-then-hibernate.target
+

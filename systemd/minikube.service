@@ -2,7 +2,7 @@
 Description=Minikube
 
 [Service]
-User=scottcrossen
+User=###USER###
 Environment=SHELL=/bin/bash
 Type=simple
 RemainAfterExit=true

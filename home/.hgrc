@@ -2,7 +2,7 @@
 merge = meld
 editor = vim
 ignore = ~/.hgignore
-username = Scott Leland Crossen <scottcrossen42@gmail.com>
+username = ###USER_FULLNAME### <###USER_EMAIL###>
 
 [templates]
 custom_compact =  '{label("log.changeset changeset.{phase}", shortest(node))} {ifeq(branch,"default","","{label('log.branch', branch)} ")}{label("grep.user", author|user)}{label("custom_compact.topic", if(topics," {topics}"))}{label("tags.normal", if(tags," {tags}"))}{label("custom_compact.book", if(bookmarks," {bookmarks}"))}\n{label(ifcontains(rev, revset('.'), 'desc.here'),desc|firstline)}\n'

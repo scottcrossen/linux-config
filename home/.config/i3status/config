@@ -13,12 +13,19 @@ general {
 
 order += "volume main"
 order += "load"
-order += "ethernet #####"
+order += "ethernet ###ETHERNET_INTERFACE###"
+order += "wireless ###WIFI_INTERFACE###"
+order += "battery 0"
 order += "tztime utc"
 order += "tztime local"
 
-ethernet ##### {
+ethernet ###ETHERNET_INTERFACE### {
         format_up = "ETHERNET: %speed"
+        format_down = ""
+}
+
+wireless ###WIFI_INTERFACE### {
+        format_up = "WIFI: %bitrate"
         format_down = ""
 }
 
@@ -36,7 +43,14 @@ volume main {
 }
 
 tztime utc {
-    format = "%H:%M UTC"
+    format = "UTC: %H:%M"
     timezone = "UTC"
 }
 
+battery 0 {
+    threshold_type = "time"
+    integer_battery_capacity = "true"
+    low_threshold = "15"
+    format = "BATTERY: %percentage"
+    format_down = ""
+}

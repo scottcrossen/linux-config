@@ -1,7 +1,8 @@
 #!/bin/bash
+#author scottcrossen
 
 SCREEN_LAYOUT_CONFIGS=("$(ls -p ~/.screenlayout | grep -v /)")
-if [ "${#distro[@]}" -eq 1 ]; then
+if [ "${#SCREEN_LAYOUT_CONFIGS[@]}" -eq 1 ]; then
   ~/.screenlayout/"${SCREEN_LAYOUT_CONFIGS[0]}"
 elif [ -f ~/.screenlayout/default.sh ]; then
   ~/.screenlayout/default.sh
