@@ -8,7 +8,7 @@ shopt -s globstar
 [ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
 
 if [ -z "${debian_chroot:-}" ] && [ -r /etc/debian_chroot ]; then
-    debian_chroot=$(cat /etc/debian_chroot)
+  debian_chroot=$(cat /etc/debian_chroot)
 fi
 
 if ! shopt -oq posix; then
@@ -20,11 +20,15 @@ if ! shopt -oq posix; then
 fi
 
 if [ -d "$HOME/bin" ] ; then
-    export PATH="$HOME/bin:$PATH"
+  export PATH="$HOME/bin:$PATH"
 fi
 
 if [ -d "$HOME/.local/bin" ]; then
-    export PATH="$HOME/.local/bin:$PATH"
+  export PATH="$HOME/.local/bin:$PATH"
+fi
+
+if [ -d "/usr/local/bin" ]; then
+  export PATH="/usr/local/bin:$PATH"
 fi
 
 HISTSIZE=20000

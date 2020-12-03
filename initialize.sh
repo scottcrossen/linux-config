@@ -196,3 +196,14 @@ echo "Installing Yubikey"
 sudo apt-add-repository --yes --update ppa:yubico/stable
 sudo apt-get -qq update > /dev/null
 sudo apt-get install yubikey-manager libpam-yubico
+sudo apt-get install -y yubico-piv-tool
+
+echo "Installing Protobuf"
+sudo apt-get -qq install -y protobuf-compiler
+
+echo "Installing Javascript"
+mkdir ~/.nvm && cd ~/.nvm && git clone https://github.com/nvm-sh/nvm.git . && cd -
+
+# echo "Installing Ruby"
+# Stuff
+# rvm rvmrc warning ignore allGemfiles

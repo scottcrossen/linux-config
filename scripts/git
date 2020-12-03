@@ -1,0 +1,19 @@
+#!/bin/bash
+#author scottcrossen
+
+PROTECTED_BRANCH='master'
+if [ -d .git ]; then
+  CURRENT_BRANCH=$(/usr/bin/git symbolic-ref HEAD | sed -e 's,.*/\(.*\),\1,')
+fi
+
+if [ "$PROTECTED_BRANCH" == "$CURRENT_BRANCH" ] && [ "$1" == "push" ]; then
+    read -p "You're about to push while on master locally, is that what you intended? (y|N) " -n 1 -r < /dev/tty
+    echo
+    if ! echo $REPLY | grep -E '^[Yy]$' > /dev/null; then
+      echo "Operation aborted"
+      exit 1
+    fi
+fi
+
+/usr/bin/git "${@:1}"
+exit $?
