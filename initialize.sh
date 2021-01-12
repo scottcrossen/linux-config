@@ -19,7 +19,7 @@ fi
 
 if [[ $(uname -m) = x86_64 ]]; then
   ARCH="amd64"
-else 
+else
   echo "Unknown architecture \"$(uname -m)\""
   exit 1
 fi
@@ -203,6 +203,15 @@ sudo apt-get -qq install -y protobuf-compiler
 
 echo "Installing Javascript"
 mkdir ~/.nvm && cd ~/.nvm && git clone https://github.com/nvm-sh/nvm.git . && cd -
+
+echo "Installing Terraform"
+git clone https://github.com/tfutils/tfenv.git ~/.tfenv
+sudo ln -s ~/.tfenv/bin/* /usr/local/bin
+
+# curl -sSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - > /dev/null 2> /dev/null
+# sudo apt-add-repository --yes --update "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+# sudo apt-get -qq update > /dev/null
+# sudo apt-get -qq install -y terraform
 
 # echo "Installing Ruby"
 # Stuff
