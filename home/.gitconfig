@@ -1,0 +1,7 @@
+[user]
+	email = ###USER_EMAIL###
+	name = ###USER_FULLNAME###
+[url "git@github.com:"]
+	insteadOf = https://github.com/
+[core]
+	editor = vim

@@ -46,7 +46,7 @@ if [ "$(sudo passwd --status "$USER" | awk '{print $2}')" != "P" ]; then
 fi
 
 echo "Copying dotfiles"
-cp -r "$SCRIPT_DIR"/home/. /home/"$USER"/
+sudo cp -r "$SCRIPT_DIR"/home/. /home/"$USER"/
 replace_with_user_details /home/"$USER"
 sudo chmod +x -R /home/"$USER"/.bashrc.d
 sudo chmod +x /home/"$USER"/.bashrc
@@ -93,22 +93,16 @@ sudo apt-get -qq install -y ./google-chrome-stable_current_$ARCH.deb > /dev/null
 
 echo "Installing Git"
 sudo apt-get -qq install git > /dev/null
-sudo su -c "git config --global user.name '$USER_FULLNAME'"
-sudo su -c "git config --global user.email '$USER_EMAIL'"
-sudo su -c "git config --global url.'ssh://git@stash.teslamotors.com:7999/'.insteadOf 'https://stash.teslamotors.com/scm/'"
-sudo su -c "git config --global url.'git@stash.teslamotors.com:7999'.insteadOf 'https://stash.teslamotors.com/'"
-sudo su -c "git config --global url.'git@github.com:'.insteadOf 'https://github.com/'"
-sudo su -c "git config --global core.editor 'vim'"
 if [ ! -f /home/"$USER"/.ssh/id_rsa ]; then
   echo "Creating ssh key"
-  sudo su -c "ssh-keygen -f ~/.ssh/id_rsa -q -N ''" "$USER"
+  sudo su -c "ssh-keygen -f /home/$USER/.ssh/id_rsa -q -N ''" "$USER"
   echo "TODO: Remember to add public ssh key to GitHub/BitBucket"
 fi
 
 echo "Configuring screen mirroring"
-git clone https://github.com/schlomo/automirror.git > /dev/null
+git clone https://github.com/schlomo/automirror.git -q > /dev/null
 mkdir -p /home/"$USER"/.screenlayout
-mv automirror/automirror.sh ./screenlayout/automirror.sh
+mv automirror/automirror.sh /home/"$USER"/.screenlayout/automirror.sh
 sudo chmod +x /home/"$USER"/.screenlayout/*
 
 echo "Installing Docker"
@@ -129,47 +123,49 @@ sudo chmod +x /usr/local/bin/docker-compose
 
 echo "Installing Kubernetes"
 curl -sSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - > /dev/null 2> /dev/null
-if ! grep -q "xenial" /etc/apt/sources.list.d/kubernetes.list; then
+if [ ! -f /etc/apt/sources.list.d/kubernetes.list ] || ! grep -q "xenial" /etc/apt/sources.list.d/kubernetes.list; then
   echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list > /dev/null
 fi
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y kubectl > /dev/null
-curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" &&
-tar zxvf krew.tar.gz &&
-KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/x86_64/amd64/' -e 's/arm.*$/arm/')" &&
-"$KREW" install krew
-"$KREW" install ctx
-"$KREW" install ns
-"$KREW" install oidc-login
+curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz"
+tar zxvf krew.tar.gz > /dev/null
+sudo -H -u "$USER" bash -c 'KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/x86_64/amd64/' -e 's/arm.*$/arm/')" && \
+sudo "$KREW" install krew > /dev/null 2> /dev/null && \
+sudo "$KREW" install ctx > /dev/null 2> /dev/null && \
+sudo "$KREW" install ns > /dev/null 2> /dev/null && \
+sudo "$KREW" install oidc-login > /dev/null 2> /dev/null'
 
 echo "Installing Minikube"
-sudo adduser $USER libvirt
 curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-$ARCH \
   && chmod +x minikube
 mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
 # TODO: systemd files need to have their username re-mapped to the current.
 sudo cp "$SCRIPT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
-sudo replace_with_user_details /lib/systemd/system/minikube.service
+replace_with_user_details /lib/systemd/system/minikube.service
 sudo systemctl daemon-reload
 sudo systemctl enable minikube.service
 
 echo "Installing HashiCorp Vault (for Kubernetes secrets)"
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
 sudo apt-add-repository --yes --update "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
+
 sudo apt-get -qq update > /dev/null
-sudo apt-get -qq install -y vault
+sudo apt-get -qq install -y vault > /dev/null
 
 echo "Installing I3"
 sudo apt-get -qq install i3
 sudo update-alternatives --install /usr/bin/x-session-manager x-session-manager /usr/bin/i3 60
 sudo dpkg-reconfigure lightdm
 sudo cp "$SCRIPT_DIR"/systemd/lock.service /lib/systemd/system/lock.service
-sudo replace_with_user_details /lib/systemd/system/lock.service
+replace_with_user_details /lib/systemd/system/lock.service
 
 echo "Installing Visual Studio Code"
-# curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null 2> /dev/null
-# sudo add-apt-repository "deb [arch=$ARCH] https://packages.microsoft.com/repos/vscode stable main"
-sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y code > /dev/null
+if [ ! -f /etc/apt/sources.list.d/vscode.list ] && ! grep -q "vscode" /etc/apt/sources.list; then
+  curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null 2> /dev/null
+  sudo add-apt-repository "deb [arch=$ARCH] https://packages.microsoft.com/repos/vscode stable main"
+  sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y code > /dev/null
+fi
 
 echo "Installing Chrome Remote Desktop"
 curl -sSLO https://dl.google.com/linux/direct/chrome-remote-desktop_current_$ARCH.deb
@@ -187,7 +183,7 @@ curl -sSLO https://dl.google.com/go/$CURRENT_VERSION.linux-$ARCH.tar.gz
 tar -C /usr/local -xzf $CURRENT_VERSION.linux-$ARCH.tar.gz
 
 echo "Installing Rust"
-curl -sSL --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+curl -sSL --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sed 's/main "$@"/main "$@" -y/g' | sh
 
 echo "Installing Ansible"
 sudo apt-add-repository --yes --update ppa:ansible/ansible
