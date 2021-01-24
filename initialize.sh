@@ -12,7 +12,7 @@ ETHERNET_INTERFACE=$(ip link show | grep -o 'en[^: ]\+')
 WIFI_INTERFACE=$(ip link show | grep -o 'wlp[^: ]\+')
 cd $TEMP_DIR
 
-if [ -z "$USER" ] || [ -z "$FULL_NAME" ] || [ -z "$USER_EMAIL" ]; then
+if [ -z "$USER" ] || [ -z "$USER_FULLNAME" ] || [ -z "$USER_EMAIL" ]; then
   echo "Usage is: $0 <user> \"<first name> <last name>\" <email>"
   exit 1
 fi
@@ -23,46 +23,47 @@ else
   echo "Unknown architecture \"$(uname -m)\""
   exit 1
 fi
-
-function replaceWithUserDetails {
-  ALL_FILES_IN_DIR=($(find ${1:-"."}))
+function replace_with_user_details {
+  ALL_FILES_IN_DIR=($(find ${1:-"."} -type f))
   for FILE in "${ALL_FILES_IN_DIR[@]}"; do
-    sed -i "s/###ETHERNET_INTERFACE###/$ETHERNET_INTERFACE/g" "$FILE"
-    sed -i "s/###WIFI_INTERFACE###/$WIFI_INTERFACE/g" "$FILE"
-    sed -i "s/###USER_EMAIL###/$USER_EMAIL/g" "$FILE"
-    sed -i "s/###USER_FULLNAME###/$USER_FULLNAME/g" "$FILE"
-    sed -i "s/###USER###/$USER/g" "$FILE"
+    sudo sed -i "s/###ETHERNET_INTERFACE###/$ETHERNET_INTERFACE/g" "$FILE"
+    sudo sed -i "s/###WIFI_INTERFACE###/$WIFI_INTERFACE/g" "$FILE"
+    sudo sed -i "s/###USER_EMAIL###/$USER_EMAIL/g" "$FILE"
+    sudo sed -i "s/###USER_FULLNAME###/$USER_FULLNAME/g" "$FILE"
+    sudo sed -i "s/###USER###/$USER/g" "$FILE"
   done
 }
 
-echo "Creating user and switching over"
-sudo useradd -m $USER
-sudo usermod -aG video $USER
-sudo usermod -aG libvert $USER
-sudo usermod -aG sudo $USER
-sudo su - $USER
-echo "Setting user password"
-passwd
+echo "Creating user $USER"
+sudo useradd -m $USER > /dev/null 2> /dev/null
+sudo usermod -aG video $USER > /dev/null 2> /dev/null
+groupadd libvert > /dev/null 2> /dev/null
+sudo usermod -aG libvert $USER > /dev/null 2> /dev/null
+sudo usermod -aG sudo $USER > /dev/null 2> /dev/null
+if [ "$(sudo passwd --status "$USER" | awk '{print $2}')" != "P" ]; then
+  echo "Setting user password"
+  sudo passwd "$USER"
+fi
 
 echo "Copying dotfiles"
-cp -r "$SCRIPT_DIR"/home/. ~
-replaceWithUserDetails ~
-sudo chmod +x -R ~/.bashrc.d
-sudo chmod +x ~/.bashrc
-sudo chmod +x ~/.xprofile
+cp -r "$SCRIPT_DIR"/home/. /home/"$USER"/
+replace_with_user_details /home/"$USER"
+sudo chmod +x -R /home/"$USER"/.bashrc.d
+sudo chmod +x /home/"$USER"/.bashrc
+sudo chmod +x /home/"$USER"/.xprofile
 
 echo "Copying udev files"
 sudo cp -r "$SCRIPT_DIR"/udev/. /etc/udev/rules.d
-sudo replaceWithUserDetails /etc/udev/rules.d
+replace_with_user_details /etc/udev/rules.d
 sudo udevadm control --reload-rules && udevadm trigger
 
 echo "Copying scripts"
 sudo cp -r "$SCRIPT_DIR"/scripts/. /usr/local/bin
-sudo replaceWithUserDetails /usr/local/bin
+replace_with_user_details /usr/local/bin
 
 echo "Copying cron jobs"
 sudo cp -r "$SCRIPT_DIR"/cron.d/. /etc/cron.d
-sudo replaceWithUserDetails /etc/cron.d
+replace_with_user_details /etc/cron.d
 sudo systemctl restart cron
 
 echo "Installing basic packages"
@@ -92,21 +93,23 @@ sudo apt-get -qq install -y ./google-chrome-stable_current_$ARCH.deb > /dev/null
 
 echo "Installing Git"
 sudo apt-get -qq install git > /dev/null
-git config --global user.name "$USER_FULLNAME"
-git config --global user.email "$USER_EMAIL"
-git config --global url."ssh://git@stash.teslamotors.com:7999/".insteadOf "https://stash.teslamotors.com/scm/"
-git config --global url."git@stash.teslamotors.com:7999".insteadOf "https://stash.teslamotors.com/"
-git config --global url."git@github.com:".insteadOf "https://github.com/"
-git config --global core.editor "vim"
-ssh-keygen -f ~/.ssh/id_rsa -q -N ""
-ssh-add ~/.ssh/id_rsa
-echo "TODO: Remember to add public ssh key to GitHub/BitBucket"
+sudo su -c "git config --global user.name '$USER_FULLNAME'"
+sudo su -c "git config --global user.email '$USER_EMAIL'"
+sudo su -c "git config --global url.'ssh://git@stash.teslamotors.com:7999/'.insteadOf 'https://stash.teslamotors.com/scm/'"
+sudo su -c "git config --global url.'git@stash.teslamotors.com:7999'.insteadOf 'https://stash.teslamotors.com/'"
+sudo su -c "git config --global url.'git@github.com:'.insteadOf 'https://github.com/'"
+sudo su -c "git config --global core.editor 'vim'"
+if [ ! -f /home/"$USER"/.ssh/id_rsa ]; then
+  echo "Creating ssh key"
+  sudo su -c "ssh-keygen -f ~/.ssh/id_rsa -q -N ''" "$USER"
+  echo "TODO: Remember to add public ssh key to GitHub/BitBucket"
+fi
 
 echo "Configuring screen mirroring"
-git clone https://github.com/schlomo/automirror.git
-mkdir -p ~/.screenlayout
+git clone https://github.com/schlomo/automirror.git > /dev/null
+mkdir -p /home/"$USER"/.screenlayout
 mv automirror/automirror.sh ./screenlayout/automirror.sh
-sudo chmod +x ~/.screenlayout/*
+sudo chmod +x /home/"$USER"/.screenlayout/*
 
 echo "Installing Docker"
 curl -sSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - > /dev/null 2> /dev/null
@@ -147,7 +150,7 @@ mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
 # TODO: systemd files need to have their username re-mapped to the current.
 sudo cp "$SCRIPT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
-sudo replaceWithUserDetails /lib/systemd/system/minikube.service
+sudo replace_with_user_details /lib/systemd/system/minikube.service
 sudo systemctl daemon-reload
 sudo systemctl enable minikube.service
 
@@ -162,7 +165,7 @@ sudo apt-get -qq install i3
 sudo update-alternatives --install /usr/bin/x-session-manager x-session-manager /usr/bin/i3 60
 sudo dpkg-reconfigure lightdm
 sudo cp "$SCRIPT_DIR"/systemd/lock.service /lib/systemd/system/lock.service
-sudo replaceWithUserDetails /lib/systemd/system/lock.service
+sudo replace_with_user_details /lib/systemd/system/lock.service
 
 echo "Installing Visual Studio Code"
 # curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null 2> /dev/null
@@ -202,11 +205,11 @@ echo "Installing Protobuf"
 sudo apt-get -qq install -y protobuf-compiler
 
 echo "Installing Javascript"
-mkdir ~/.nvm && cd ~/.nvm && git clone https://github.com/nvm-sh/nvm.git . && cd -
+mkdir /home/"$USER"/.nvm && cd /home/"$USER"/.nvm && git clone https://github.com/nvm-sh/nvm.git . && cd -
 
 echo "Installing Terraform"
-git clone https://github.com/tfutils/tfenv.git ~/.tfenv
-sudo ln -s ~/.tfenv/bin/* /usr/local/bin
+git clone https://github.com/tfutils/tfenv.git /home/"$USER"/.tfenv
+sudo ln -s /home/"$USER"/.tfenv/bin/* /usr/local/bin
 
 # curl -sSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - > /dev/null 2> /dev/null
 # sudo apt-add-repository --yes --update "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
