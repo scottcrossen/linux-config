@@ -46,8 +46,9 @@ if [ "$(sudo passwd --status "$USER" | awk '{print $2}')" != "P" ]; then
 fi
 
 echo "Copying dotfiles"
-sudo cp -r "$SCRIPT_DIR"/home/. /home/"$USER"/
-replace_with_user_details /home/"$USER"
+sudo cp -r "$SCRIPT_DIR"/home/. ./home/
+replace_with_user_details ./home
+sudo cp -r ./home/. /home/"$USER"/
 sudo chmod +x -R /home/"$USER"/.bashrc.d
 sudo chmod +x /home/"$USER"/.bashrc
 sudo chmod +x /home/"$USER"/.xprofile
@@ -101,8 +102,8 @@ fi
 
 echo "Configuring screen mirroring"
 git clone https://github.com/schlomo/automirror.git -q > /dev/null
-mkdir -p /home/"$USER"/.screenlayout
-mv automirror/automirror.sh /home/"$USER"/.screenlayout/automirror.sh
+sudo mkdir -p /home/"$USER"/.screenlayout
+sudo mv automirror/automirror.sh /home/"$USER"/.screenlayout/automirror.sh
 sudo chmod +x /home/"$USER"/.screenlayout/*
 
 echo "Installing Docker"
@@ -140,7 +141,6 @@ curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/mini
   && chmod +x minikube
 mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
-# TODO: systemd files need to have their username re-mapped to the current.
 sudo cp "$SCRIPT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
 replace_with_user_details /lib/systemd/system/minikube.service
 sudo systemctl daemon-reload
@@ -149,7 +149,6 @@ sudo systemctl enable minikube.service
 echo "Installing HashiCorp Vault (for Kubernetes secrets)"
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
 sudo apt-add-repository --yes --update "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-
 sudo apt-get -qq update > /dev/null
 sudo apt-get -qq install -y vault > /dev/null
 
@@ -165,6 +164,7 @@ if [ ! -f /etc/apt/sources.list.d/vscode.list ] && ! grep -q "vscode" /etc/apt/s
   curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null 2> /dev/null
   sudo add-apt-repository "deb [arch=$ARCH] https://packages.microsoft.com/repos/vscode stable main"
   sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y code > /dev/null
+  sudo rm /etc/apt/sources.list.d/vscode.list
 fi
 
 echo "Installing Chrome Remote Desktop"
@@ -180,37 +180,52 @@ VERSION_REGEX='\"version\":\s*\"([^"]*)\"'
 [[ $(curl -sSL 'https://golang.org/dl/?mode=json') =~ $VERSION_REGEX ]]
 CURRENT_VERSION="${BASH_REMATCH[1]}"
 curl -sSLO https://dl.google.com/go/$CURRENT_VERSION.linux-$ARCH.tar.gz
-tar -C /usr/local -xzf $CURRENT_VERSION.linux-$ARCH.tar.gz
+sudo tar -C /usr/local -xzf $CURRENT_VERSION.linux-$ARCH.tar.gz
 
 echo "Installing Rust"
-curl -sSL --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sed 's/main "$@"/main "$@" -y/g' | sh
+curl -sSL --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sed 's/main "$@"/main "$@" -y > \/dev\/null 2> \/dev\/null/g' | sh > /dev/null
 
 echo "Installing Ansible"
-sudo apt-add-repository --yes --update ppa:ansible/ansible
-sudo apt-get -qq update > /dev/null
+if ! grep -q "ansible" /etc/apt/sources.list; then
+  sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
+  sudo add-apt-repository "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main"
+  sudo apt-get -qq update > /dev/null
+fi
 sudo apt-get -qq install -y ansible
 
 echo "Installing Yubikey"
-sudo apt-add-repository --yes --update ppa:yubico/stable
+if ! dpkg -s yubikey-manager 2> /dev/null | grep -q "Status"; then
+  sudo apt-add-repository --yes --update ppa:yubico/stable
+fi
 sudo apt-get -qq update > /dev/null
-sudo apt-get install yubikey-manager libpam-yubico
-sudo apt-get install -y yubico-piv-tool
+sudo apt-get -qq install -y yubikey-manager libpam-yubico
+if ! dpkg -s yubico-piv-tool 2> /dev/null | grep -q "Status"; then
+  # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=926551
+  curl -sSlO http://http.us.debian.org/debian/pool/main/y/yubico-piv-tool/libykpiv2_2.1.1-3_amd64.deb
+  sudo dpkg -i --force-depends libykpiv2_2.1.1-3_amd64.deb  > /dev/null
+  curl -sSLO http://http.us.debian.org/debian/pool/main/y/yubico-piv-tool/yubico-piv-tool_2.1.1-3_amd64.deb
+  sudo dpkg -i --force-depends yubico-piv-tool_2.1.1-3_amd64.deb  > /dev/null
+fi
+sudo apt-get -qq install -y yubico-piv-tool
 
 echo "Installing Protobuf"
 sudo apt-get -qq install -y protobuf-compiler
 
 echo "Installing Javascript"
-sudo mkdir /home/"$USER"/.nvm && sudo git clone https://github.com/nvm-sh/nvm.git /home/"$USER"/.nvm
+if [ ! -d /home/"$USER"/.nvm ]; then
+  sudo mkdir -p /home/"$USER"/.nvm
+  sudo git clone https://github.com/nvm-sh/nvm.git /home/"$USER"/.nvm -q
+fi
 
 echo "Installing Terraform"
-git clone https://github.com/tfutils/tfenv.git /home/"$USER"/.tfenv
-sudo ln -s /home/"$USER"/.tfenv/bin/* /usr/local/bin
+if [ ! -d /home/"$USER"/.tfenv ]; then
+  sudo mkdir -p /home/"$USER"/.tfenv
+  git clone https://github.com/tfutils/tfenv.git /home/"$USER"/.tfenv -q
+  sudo ln -s /home/"$USER"/.tfenv/bin/* /usr/local/bin
+fi
 
-# curl -sSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - > /dev/null 2> /dev/null
-# sudo apt-add-repository --yes --update "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
-# sudo apt-get -qq update > /dev/null
-# sudo apt-get -qq install -y terraform
+echo "Installing Ruby"
+gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+curl -sSL https://get.rvm.io  | sed 's/rvm_install "$@"/rvm_install "$@" > \/dev\/null 2> \/dev\/null/g' | bash -s stable --ruby > /dev/null
+rvm rvmrc warning ignore allGemfiles
 
-# echo "Installing Ruby"
-# Stuff
-# rvm rvmrc warning ignore allGemfiles
