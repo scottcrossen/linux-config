@@ -133,7 +133,6 @@ if ! grep -q "xenial" /etc/apt/sources.list.d/kubernetes.list; then
   echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list > /dev/null
 fi
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y kubectl > /dev/null
-cd "$(mktemp -d)" &&
 curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" &&
 tar zxvf krew.tar.gz &&
 KREW=./krew-"$(uname | tr '[:upper:]' '[:lower:]')_$(uname -m | sed -e 's/x86_64/amd64/' -e 's/arm.*$/arm/')" &&
@@ -205,7 +204,7 @@ echo "Installing Protobuf"
 sudo apt-get -qq install -y protobuf-compiler
 
 echo "Installing Javascript"
-mkdir /home/"$USER"/.nvm && cd /home/"$USER"/.nvm && git clone https://github.com/nvm-sh/nvm.git . && cd -
+sudo mkdir /home/"$USER"/.nvm && sudo git clone https://github.com/nvm-sh/nvm.git /home/"$USER"/.nvm
 
 echo "Installing Terraform"
 git clone https://github.com/tfutils/tfenv.git /home/"$USER"/.tfenv
