@@ -26,6 +26,7 @@ fi
 function replace_with_user_details {
   ALL_FILES_IN_DIR=($(find ${1:-"."} -type f))
   for FILE in "${ALL_FILES_IN_DIR[@]}"; do
+    # TODO: IF no interface then it needs to be removed
     sudo sed -i "s/###ETHERNET_INTERFACE###/$ETHERNET_INTERFACE/g" "$FILE"
     sudo sed -i "s/###WIFI_INTERFACE###/$WIFI_INTERFACE/g" "$FILE"
     sudo sed -i "s/###USER_EMAIL###/$USER_EMAIL/g" "$FILE"
@@ -38,8 +39,10 @@ echo "Creating user $USER"
 sudo useradd -m $USER > /dev/null 2> /dev/null
 sudo usermod -aG video $USER > /dev/null 2> /dev/null
 groupadd libvert > /dev/null 2> /dev/null
+groupadd chrome-remote-desktop > /dev/null 2> /dev/null
 sudo usermod -aG libvert $USER > /dev/null 2> /dev/null
 sudo usermod -aG sudo $USER > /dev/null 2> /dev/null
+sudo usermod -aG chrome-remote-desktop $USER > /dev/null 2> /dev/null
 if [ "$(sudo passwd --status "$USER" | awk '{print $2}')" != "P" ]; then
   echo "Setting user password"
   sudo passwd "$USER"
@@ -114,8 +117,6 @@ sudo add-apt-repository \
   stable"
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y docker-ce docker-ce-cli containerd.io > /dev/null
 sudo usermod -aG docker $USER
-echo "Logging into docker"
-docker login
 
 echo "Installing docker compose"
 # Personally, I think docker compose is stupid. However, some repositories think we need it for some reason.
@@ -146,8 +147,8 @@ replace_with_user_details /lib/systemd/system/minikube.service
 sudo systemctl daemon-reload
 sudo systemctl enable minikube.service
 
-echo "Installing HashiCorp Vault (for Kubernetes secrets)"
-curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add -
+echo "Installing HashiCorp Vault"
+curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - > /dev/null 2> /dev/null
 sudo apt-add-repository --yes --update "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 sudo apt-get -qq update > /dev/null
 sudo apt-get -qq install -y vault > /dev/null
@@ -173,7 +174,7 @@ sudo dpkg --install chrome-remote-desktop_current_$ARCH.deb > /dev/null
 sudo apt-get -qq install --assume-yes --fix-broken
 sudo touch /etc/chrome-remote-desktop-session
 sudo bash -c 'echo "exec /etc/X11/Xsession /usr/bin/xfce4-session" > /etc/chrome-remote-desktop-session'
-echo "TODO: Remember to add this computer to chrome remote desktop list"
+echo "TODO: Remember to add this computer to chrome remote desktop list at https://remotedesktop.google.com/headless"
 
 echo "Installing Golang"
 VERSION_REGEX='\"version\":\s*\"([^"]*)\"'
@@ -225,8 +226,11 @@ if [ ! -d /home/"$USER"/.tfenv ]; then
 fi
 
 echo "Installing Ruby"
-gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB
+gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB > /dev/null 2> /dev/null
 curl -sSL https://get.rvm.io  | sed 's/rvm_install "$@"/rvm_install "$@" > \/dev\/null 2> \/dev\/null/g' | bash -s stable --ruby > /dev/null
 source /usr/local/rvm/scripts/rvm
 rvm rvmrc warning ignore allGemfiles
+
+echo "Chowning everything to $USER"
+sudo chown -R "$USER" /home/"$USER"
 

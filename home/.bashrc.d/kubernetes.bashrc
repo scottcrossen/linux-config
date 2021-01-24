@@ -1,7 +1,7 @@
 #!/bin/bash
 #author scottcrossen
 
-if minikube -p minikube docker-env | grep -q "To fix this"; then
+if minikube -p minikube docker-env | grep -q "To fix this" || minikube -p minikube docker-env | grep -q "minikube start"; then
   echo "Minikube not started"
 else
   eval "$(minikube -p minikube docker-env)"
