@@ -23,6 +23,17 @@ else
   echo "Unknown architecture \"$(uname -m)\""
   exit 1
 fi
+
+HEADLESS=false
+for EXTRA_ARG in "${@:4}"; do
+  if [ "$EXTRA_ARG" = "--headless" ]; then
+    HEADLESS=true
+  else
+    echo "Unknown argument $EXTRA_ARG"
+    exit 1
+  fi
+done
+
 function replace_with_user_details {
   ALL_FILES_IN_DIR=($(find ${1:-"."} -type f))
   for FILE in "${ALL_FILES_IN_DIR[@]}"; do
@@ -32,6 +43,16 @@ function replace_with_user_details {
     sudo sed -i "s/###USER_EMAIL###/$USER_EMAIL/g" "$FILE"
     sudo sed -i "s/###USER_FULLNAME###/$USER_FULLNAME/g" "$FILE"
     sudo sed -i "s/###USER###/$USER/g" "$FILE"
+    if [ -z "$ETHERNET_INTERFACE" ]; then
+      sudo sed -i "s/###HAS_ETHERNET.*$//g" "$FILE"
+    else
+      sudo sed -i "s/###HAS_ETHERNET//g" "$FILE"
+    fi
+    if [ -z "$WIFI_INTERFACE" ]; then
+      sudo sed -i "s/###HAS_WIFI###.*$//g" "$FILE"
+    else
+      sudo sed -i "s/###HAS_WIFI###//g" "$FILE"
+    fi
   done
 }
 
@@ -48,26 +69,29 @@ if [ "$(sudo passwd --status "$USER" | awk '{print $2}')" != "P" ]; then
   sudo passwd "$USER"
 fi
 
+echo "Copying and chowning files"
+mkdir -p linux-config
+ARTIFACT_DIR="$(pwd)"/linx-config
+sudo cp -r "$SCRIPT_DIR" "$ARTIFACT_DIR"
+sudo chown -R "$USER" "$ARTIFACT_DIR"
+replace_with_user_details "$ARTIFACT_DIR"
+
 echo "Copying dotfiles"
-sudo cp -r "$SCRIPT_DIR"/home/. ./home/
-replace_with_user_details ./home
+sudo cp -r "$ARTIFACT_DIR"/home/. ./home/
 sudo cp -r ./home/. /home/"$USER"/
 sudo chmod +x -R /home/"$USER"/.bashrc.d
 sudo chmod +x /home/"$USER"/.bashrc
 sudo chmod +x /home/"$USER"/.xprofile
 
 echo "Copying udev files"
-sudo cp -r "$SCRIPT_DIR"/udev/. /etc/udev/rules.d
-replace_with_user_details /etc/udev/rules.d
+sudo cp -r "$ARTIFACT_DIR"/udev/. /etc/udev/rules.d
 sudo udevadm control --reload-rules && udevadm trigger
 
 echo "Copying scripts"
-sudo cp -r "$SCRIPT_DIR"/scripts/. /usr/local/bin
-replace_with_user_details /usr/local/bin
+sudo cp -r "$ARTIFACT_DIR"/scripts/. /usr/local/bin
 
 echo "Copying cron jobs"
-sudo cp -r "$SCRIPT_DIR"/cron.d/. /etc/cron.d
-replace_with_user_details /etc/cron.d
+sudo cp -r "$ARTIFACT_DIR"/cron.d/. /etc/cron.d
 sudo systemctl restart cron
 
 echo "Installing basic packages"
@@ -88,8 +112,11 @@ sudo apt-get -qq install -y \
   python3-psutil \
   arandr \
   brightnessctl \
-  jq \
-  lightdm  > /dev/null
+  jq > /dev/null
+
+if [ "$HEADLESS" != "true" ]; then
+  sudo apt-get -qq install -y lightdm  > /dev/null
+fi
 
 echo "Installing Google Chrome"
 curl -sSLo google-chrome-stable_current_$ARCH.deb https://dl.google.com/linux/direct/google-chrome-stable_current_$ARCH.deb
@@ -142,8 +169,7 @@ curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/mini
   && chmod +x minikube
 mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
-sudo cp "$SCRIPT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
-replace_with_user_details /lib/systemd/system/minikube.service
+sudo cp "$ARTIFACT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
 sudo systemctl daemon-reload
 sudo systemctl enable minikube.service
 
@@ -154,11 +180,16 @@ sudo apt-get -qq update > /dev/null
 sudo apt-get -qq install -y vault > /dev/null
 
 echo "Installing I3"
-sudo apt-get -qq install i3
+if [ "$HEADLESS" != "true" ]; then
+  sudo apt-get -qq install i3
+else
+  sudo DEBIAN_FRONTEND=noninteractive apt install --assume-yes -qq i3 desktop-base
+fi
 sudo update-alternatives --install /usr/bin/x-session-manager x-session-manager /usr/bin/i3 60
-sudo dpkg-reconfigure lightdm
-sudo cp "$SCRIPT_DIR"/systemd/lock.service /lib/systemd/system/lock.service
-replace_with_user_details /lib/systemd/system/lock.service
+if [ "$HEADLESS" != "true" ]; then
+  sudo dpkg-reconfigure lightdm
+fi
+sudo cp "$ARTIFACT_DIR"/systemd/lock.service /lib/systemd/system/lock.service
 
 echo "Installing Visual Studio Code"
 if [ ! -f /etc/apt/sources.list.d/vscode.list ] && ! grep -q "vscode" /etc/apt/sources.list; then
@@ -174,6 +205,9 @@ sudo dpkg --install chrome-remote-desktop_current_$ARCH.deb > /dev/null
 sudo apt-get -qq install --assume-yes --fix-broken
 sudo touch /etc/chrome-remote-desktop-session
 sudo bash -c 'echo "exec /etc/X11/Xsession /usr/bin/xfce4-session" > /etc/chrome-remote-desktop-session'
+if [ "$HEADLES" = "true" ]; then
+  sudo systemctl disable lightdm.service
+fi
 echo "TODO: Remember to add this computer to chrome remote desktop list at https://remotedesktop.google.com/headless"
 
 echo "Installing Golang"
