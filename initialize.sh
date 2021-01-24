@@ -44,9 +44,9 @@ function replace_with_user_details {
     sudo sed -i "s/###USER_FULLNAME###/$USER_FULLNAME/g" "$FILE"
     sudo sed -i "s/###USER###/$USER/g" "$FILE"
     if [ -z "$ETHERNET_INTERFACE" ]; then
-      sudo sed -i "s/###HAS_ETHERNET.*$//g" "$FILE"
+      sudo sed -i "s/###HAS_ETHERNET###.*$//g" "$FILE"
     else
-      sudo sed -i "s/###HAS_ETHERNET//g" "$FILE"
+      sudo sed -i "s/###HAS_ETHERNET###//g" "$FILE"
     fi
     if [ -z "$WIFI_INTERFACE" ]; then
       sudo sed -i "s/###HAS_WIFI###.*$//g" "$FILE"
@@ -112,6 +112,7 @@ sudo apt-get -qq install -y \
   python3-psutil \
   arandr \
   brightnessctl \
+  gnome-terminal \
   jq > /dev/null
 
 if [ "$HEADLESS" != "true" ]; then
@@ -229,6 +230,7 @@ fi
 sudo apt-get -qq install -y ansible
 
 echo "Installing Yubikey"
+# TODO: This doesn't seem to work great
 if ! dpkg -s yubikey-manager 2> /dev/null | grep -q "Status"; then
   sudo apt-add-repository --yes --update ppa:yubico/stable
 fi
@@ -265,6 +267,6 @@ curl -sSL https://get.rvm.io  | sed 's/rvm_install "$@"/rvm_install "$@" > \/dev
 source /usr/local/rvm/scripts/rvm
 rvm rvmrc warning ignore allGemfiles
 
-echo "Chowning everything to $USER"
+echo "Chowning home directory to $USER"
 sudo chown -R "$USER" /home/"$USER"
 
