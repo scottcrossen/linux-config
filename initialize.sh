@@ -168,6 +168,10 @@ tar zxvf krew.tar.gz > /dev/null && KREW=./krew-"$(uname | tr "[:upper:]" "[:low
 "$KREW" install ns > /dev/null 2> /dev/null && \
 "$KREW" install oidc-login > /dev/null 2> /dev/null'
 
+echo "Installing concourse fly CLI"
+curl -sSL https://api.github.com/repos/concourse/concourse/releases/latest | grep "browser_download_url.*fly.*$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCH.tgz\"" | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo fly.tgz
+sudo tar -C /usr/local/bin -zxvf fly.tgz > /dev/null
+
 echo "Installing Minikube"
 curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-$ARCH \
   && chmod +x minikube
@@ -184,6 +188,7 @@ sudo chmod 700 get_helm.sh
 curl -sSL https://api.github.com/repos/roboll/helmfile/releases/latest | grep "browser_download_url.*$(uname -s | tr '[:upper:]' '[:lower:]')_$ARCH" | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo helmfile
 sudo chmod +x helmfile
 sudo install helmfile /usr/local/bin/
+helm plugin install https://github.com/databus23/helm-diff > /dev/null 2> /dev/null
 
 echo "Installing HashiCorp Vault"
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - > /dev/null 2> /dev/null
