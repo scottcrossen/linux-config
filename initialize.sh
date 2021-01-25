@@ -256,7 +256,7 @@ fi
 echo "Installing Terraform"
 if [ ! -d /home/"$USER"/.tfenv ]; then
   sudo mkdir -p /home/"$USER"/.tfenv
-  git clone https://github.com/tfutils/tfenv.git /home/"$USER"/.tfenv -q
+  sudo git clone https://github.com/tfutils/tfenv.git /home/"$USER"/.tfenv -q
   sudo ln -s /home/"$USER"/.tfenv/bin/* /usr/local/bin
 fi
 
