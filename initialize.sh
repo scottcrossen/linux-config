@@ -179,8 +179,11 @@ sudo systemctl enable minikube.service
 
 echo "Installing Helm"
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
-chmod 700 get_helm.sh
+sudo chmod 700 get_helm.sh
 ./get_helm.sh > /dev/null
+curl -sSL https://api.github.com/repos/roboll/helmfile/releases/latest | grep "browser_download_url.*$(uname -s | tr '[:upper:]' '[:lower:]')_$ARCH" | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo helmfile
+sudo chmod +x helmfile
+sudo install helmfile /usr/local/bin/
 
 echo "Installing HashiCorp Vault"
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - > /dev/null 2> /dev/null
