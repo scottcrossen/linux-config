@@ -13,3 +13,4 @@ export PATH="${KREW_ROOT:-$HOME/.krew}/bin:$PATH"
 alias kubectx='kubectl ctx'
 alias kubenx='kubectl ns'
 alias kubelogin='kubectl oidc-login'
+alias krew='kubectl krew'
