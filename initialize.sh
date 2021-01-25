@@ -115,7 +115,7 @@ sudo apt-get -qq install -y \
   python3-psutil \
   arandr \
   brightnessctl \
-  gnome-terminal \
+  xfce4-terminal \
   jq > /dev/null
 
 if [ "$HEADLESS" != "true" ]; then
