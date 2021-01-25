@@ -177,6 +177,11 @@ sudo cp "$ARTIFACT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.se
 sudo systemctl daemon-reload
 sudo systemctl enable minikube.service
 
+echo "Installing Helm"
+curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
+chmod 700 get_helm.sh
+./get_helm.sh > /dev/null
+
 echo "Installing HashiCorp Vault"
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - > /dev/null 2> /dev/null
 sudo apt-add-repository --yes --update "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
