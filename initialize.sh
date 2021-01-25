@@ -235,7 +235,7 @@ curl -sSLO https://dl.google.com/go/$CURRENT_VERSION.linux-$ARCH.tar.gz
 sudo tar -C /usr/local -xzf $CURRENT_VERSION.linux-$ARCH.tar.gz
 
 echo "Installing Rust"
-curl -sSL --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sed 's/main "$@"/main "$@" -y > \/dev\/null 2> \/dev\/null/g' | sh > /dev/null
+sudo -H -u "$USER" bash -c 'curl -sSL --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sed "s/main "$@"/main "$@" -y > \/dev\/null 2> \/dev\/null/g" | sh > /dev/null'
 
 echo "Installing Ansible"
 if ! grep -q "ansible" /etc/apt/sources.list; then
