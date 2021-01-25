@@ -230,7 +230,6 @@ fi
 sudo apt-get -qq install -y ansible
 
 echo "Installing Yubikey"
-# TODO: This doesn't seem to work great
 if [ -z "$(sudo apt-cache search yubikey-manager)" ]; then
   sudo apt-add-repository --yes --update ppa:yubico/stable
   sudo apt-get -qq update > /dev/null
