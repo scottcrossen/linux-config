@@ -231,12 +231,12 @@ sudo apt-get -qq install -y ansible
 
 echo "Installing Yubikey"
 # TODO: This doesn't seem to work great
-if ! dpkg -s yubikey-manager 2> /dev/null | grep -q "Status"; then
+if [ -z "$(sudo apt-cache search yubikey-manager)" ]; then
   sudo apt-add-repository --yes --update ppa:yubico/stable
+  sudo apt-get -qq update > /dev/null
 fi
-sudo apt-get -qq update > /dev/null
 sudo apt-get -qq install -y yubikey-manager libpam-yubico
-if ! dpkg -s yubico-piv-tool 2> /dev/null | grep -q "Status"; then
+if [ -z "$(sudo apt-cache search yubico-piv-tool)" ]; then
   # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=926551
   curl -sSlO http://http.us.debian.org/debian/pool/main/y/yubico-piv-tool/libykpiv2_2.1.1-3_amd64.deb
   sudo dpkg -i --force-depends libykpiv2_2.1.1-3_amd64.deb  > /dev/null
