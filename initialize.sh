@@ -25,9 +25,12 @@ else
 fi
 
 HEADLESS=false
+HAS_RUBY=false
 for EXTRA_ARG in "${@:4}"; do
   if [ "$EXTRA_ARG" = "--headless" ]; then
     HEADLESS=true
+  elif [ "$EXTRA_ARG" = "--has_ruby" ]; then
+    HAS_RUBY=trie
   else
     echo "Unknown argument $EXTRA_ARG"
     exit 1
@@ -260,11 +263,13 @@ if [ ! -d /home/"$USER"/.tfenv ]; then
   sudo ln -s /home/"$USER"/.tfenv/bin/* /usr/local/bin
 fi
 
-echo "Installing Ruby"
-gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB > /dev/null 2> /dev/null
-curl -sSL https://get.rvm.io  | sed 's/rvm_install "$@"/rvm_install "$@" > \/dev\/null 2> \/dev\/null/g' | bash -s stable --ruby > /dev/null
-source /usr/local/rvm/scripts/rvm
-rvm rvmrc warning ignore allGemfiles
+if [ "$HAS_RUBY" = "true" ]; then
+  echo "Installing Ruby"
+  gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB > /dev/null 2> /dev/null
+  curl -sSL https://get.rvm.io  | sed 's/rvm_install "$@"/rvm_install "$@" > \/dev\/null 2> \/dev\/null/g' | bash -s stable --ruby > /dev/null
+  source /usr/local/rvm/scripts/rvm
+  rvm rvmrc warning ignore allGemfiles
+fi
 
 echo "Chowning home directory to $USER"
 sudo chown -R "$USER" /home/"$USER"
