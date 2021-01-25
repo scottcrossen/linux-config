@@ -163,10 +163,10 @@ sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y kubectl > /de
 sudo -H -u "$USER" bash -c 'cd "$(mktemp -d)" && export PATH="${PATH}:${HOME}/.krew/bin" && \
 curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" && \
 tar zxvf krew.tar.gz > /dev/null && KREW=./krew-"$(uname | tr "[:upper:]" "[:lower:]")"_"$(uname -m | sed -e "s/x86_64/amd64/" -e "s/arm.*$/arm/")" && \
-"$KREW" install krew && \
-"$KREW" install ctx && \
-"$KREW" install ns && \
-"$KREW" install oidc-login'
+"$KREW" install krew > /dev/null 2> /dev/null && \
+"$KREW" install ctx > /dev/null 2> /dev/null && \
+"$KREW" install ns > /dev/null 2> /dev/null && \
+"$KREW" install oidc-login > /dev/null 2> /dev/null'
 
 echo "Installing Minikube"
 curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-$ARCH \
