@@ -159,6 +159,7 @@ if [ ! -f /etc/apt/sources.list.d/kubernetes.list ] || ! grep -q "xenial" /etc/a
   echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list > /dev/null
 fi
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y kubectl > /dev/null
+# TODO: verify that this works
 sudo -H -u "$USER" bash -c 'cd "$(mktemp -d)" && export PATH="${PATH}:${HOME}/.krew/bin" && \
 curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" && \
 tar zxvf krew.tar.gz > /dev/null && KREW=./krew-"$(uname | tr "[:upper:]" "[:lower:]")"_"$(uname -m | sed -e "s/x86_64/amd64/" -e "s/arm.*$/arm/")" && \
@@ -187,7 +188,8 @@ sudo chmod 700 get_helm.sh
 curl -sSL https://api.github.com/repos/roboll/helmfile/releases/latest | grep "browser_download_url.*$(uname -s | tr '[:upper:]' '[:lower:]')_$ARCH" | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo helmfile
 sudo chmod +x helmfile
 sudo install helmfile /usr/local/bin/
-helm plugin install https://github.com/databus23/helm-diff > /dev/null 2> /dev/null
+# TODO: Verify that this works: Issues with /tmp ?
+sudo -H -u "$USER" bash -c 'helm plugin install https://github.com/databus23/helm-diff > /dev/null 2> /dev/null'
 
 echo "Installing HashiCorp Vault"
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - > /dev/null 2> /dev/null
