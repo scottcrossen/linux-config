@@ -171,7 +171,7 @@ exec --no-startup-id xset s off
 exec --no-startup-id i3-msg 'workspace 3; exec i3-sensible-terminal; workspace 1'
 exec --no-startup-id google-chrome-stable --new-window --app=https://music.youtube.com/
 exec --no-startup-id google-chrome-stable --new-window --app=https://mail.google.com/mail/u/0/#inbox
-exec --no-startup-id google-chrome-stable --new-window --app=https://app.element.io/
+exec --no-startup-id google-chrome-stable --new-window --app=https://element.scottcrossen.com/
 exec --no-startup-id google-chrome-stable --new-window
 exec --no-startup-id code
 assign [class="Google-chrome" instance="music.youtube.com"] 7
