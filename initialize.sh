@@ -40,7 +40,6 @@ done
 function replace_with_user_details {
   ALL_FILES_IN_DIR=($(find ${1:-"."} -type f))
   for FILE in "${ALL_FILES_IN_DIR[@]}"; do
-    # TODO: IF no interface then it needs to be removed
     sudo sed -i "s/###ETHERNET_INTERFACE###/$ETHERNET_INTERFACE/g" "$FILE"
     sudo sed -i "s/###WIFI_INTERFACE###/$WIFI_INTERFACE/g" "$FILE"
     sudo sed -i "s/###USER_EMAIL###/$USER_EMAIL/g" "$FILE"
@@ -88,7 +87,7 @@ sudo chmod +x /home/"$USER"/.xprofile
 
 echo "Copying udev files"
 sudo cp -r "$ARTIFACT_DIR"/udev/. /etc/udev/rules.d
-sudo udevadm control --reload-rules && udevadm trigger
+sudo udevadm control --reload-rules && sudo udevadm trigger
 
 echo "Copying scripts"
 sudo cp -r "$ARTIFACT_DIR"/scripts/. /usr/local/bin
