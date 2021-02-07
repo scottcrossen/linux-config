@@ -102,6 +102,7 @@ echo "Installing basic packages"
 sudo apt-get -qq update > /dev/null
 sudo apt-get -qq install -y \
   apt-transport-https \
+  gnupg \
   gnupg2 \
   curl \
   vim \
@@ -175,6 +176,11 @@ sudo cp "$ARTIFACT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.se
 sudo systemctl daemon-reload
 sudo systemctl enable minikube.service
 
+echo "Installing sops"
+curl -sSL https://api.github.com/repos/mozilla/sops/releases/latest  | grep "browser_download_url.*$(uname -s | tr '[:upper:]' '[:lower:]')"  | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo sops
+sudo chmod +x sops
+sudo install sops /usr/local/bin/
+
 echo "Installing Helm"
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
 sudo chmod 700 get_helm.sh
@@ -184,6 +190,7 @@ sudo chmod +x helmfile
 sudo install helmfile /usr/local/bin/
 # TODO: Verify that this works: Issues with /tmp ?
 sudo -H -u "$USER" bash -c 'helm plugin install https://github.com/databus23/helm-diff > /dev/null 2> /dev/null'
+sudo -H -u "$USER" bash -c 'helm plugin install https://github.com/jkroepke/helm-secrets > /dev/null 2> /dev/null'
 
 echo "Installing HashiCorp Vault"
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - > /dev/null 2> /dev/null
@@ -280,6 +287,14 @@ if [ "$HAS_RUBY" = "true" ]; then
   source /usr/local/rvm/scripts/rvm
   rvm rvmrc warning ignore allGemfiles
 fi
+
+echo "Installing gcloud"
+
+if [ ! -f /etc/apt/sources.list.d/google-cloud-sdk.list ]; then
+  echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
+  curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
+fi
+sudo apt-get update && sudo apt-get install google-cloud-sdk
 
 echo "Chowning home directory to $USER"
 sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"USER"/.gitconfig
