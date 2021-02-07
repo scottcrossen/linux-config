@@ -84,6 +84,8 @@ sudo cp -r ./home/. /home/"$USER"/
 sudo chmod +x -R /home/"$USER"/.bashrc.d
 sudo chmod +x /home/"$USER"/.bashrc
 sudo chmod +x /home/"$USER"/.xprofile
+# The ssh key has not been added yet. We need to use https for everything
+sudo rm /home/"$USER"/.gitconfig
 
 echo "Copying udev files"
 sudo cp -r "$ARTIFACT_DIR"/udev/. /etc/udev/rules.d
@@ -159,14 +161,6 @@ if [ ! -f /etc/apt/sources.list.d/kubernetes.list ] || ! grep -q "xenial" /etc/a
   echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list > /dev/null
 fi
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y kubectl > /dev/null
-# TODO: verify that this works
-sudo -H -u "$USER" bash -c 'cd "$(mktemp -d)" && export PATH="${PATH}:${HOME}/.krew/bin" && \
-curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" && \
-tar zxvf krew.tar.gz > /dev/null && KREW=./krew-"$(uname | tr "[:upper:]" "[:lower:]")"_"$(uname -m | sed -e "s/x86_64/amd64/" -e "s/arm.*$/arm/")" && \
-"$KREW" install krew > /dev/null 2> /dev/null && \
-"$KREW" install ctx > /dev/null 2> /dev/null && \
-"$KREW" install ns > /dev/null 2> /dev/null && \
-"$KREW" install oidc-login > /dev/null 2> /dev/null'
 
 echo "Installing concourse fly CLI"
 curl -sSL https://api.github.com/repos/concourse/concourse/releases/latest | grep "browser_download_url.*fly.*$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCH.tgz\"" | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo fly.tgz
@@ -286,5 +280,17 @@ if [ "$HAS_RUBY" = "true" ]; then
 fi
 
 echo "Chowning home directory to $USER"
+sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"USER"/.gitconfig
 sudo chown -R "$USER" /home/"$USER"
 
+echo "Installing krew"
+# TODO: verify that this works
+sudo -H -u "$USER" bash -c 'cd "$(mktemp -d)" && export PATH="${PATH}:${HOME}/.krew/bin" && \
+curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" && \
+tar zxvf krew.tar.gz && KREW=./krew-"$(uname | tr "[:upper:]" "[:lower:]")"_"$(uname -m | sed -e "s/x86_64/amd64/" -e "s/arm.*$/arm/")" && \
+"$KREW" install krew && \
+"$KREW" install ctx && \
+"$KREW" install ns && \
+"$KREW" install oidc-login'
+
+echo "Finished"
