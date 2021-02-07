@@ -202,6 +202,8 @@ if [ "$HEADLESS" != "true" ]; then
   sudo dpkg-reconfigure lightdm
 fi
 sudo cp "$ARTIFACT_DIR"/systemd/lock.service /lib/systemd/system/lock.service
+sudo systemctl daemon-reload
+sudo systemctl start lock.service
 
 echo "Installing Visual Studio Code"
 if [ ! -f /etc/apt/sources.list.d/vscode.list ] && ! grep -q "vscode" /etc/apt/sources.list; then
