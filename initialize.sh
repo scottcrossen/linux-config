@@ -188,7 +188,6 @@ sudo chmod 700 get_helm.sh
 curl -sSL https://api.github.com/repos/roboll/helmfile/releases/latest | grep "browser_download_url.*$(uname -s | tr '[:upper:]' '[:lower:]')_$ARCH" | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo helmfile
 sudo chmod +x helmfile
 sudo install helmfile /usr/local/bin/
-# TODO: Verify that this works: Issues with /tmp ?
 sudo -H -u "$USER" bash -c 'helm plugin install https://github.com/databus23/helm-diff > /dev/null 2> /dev/null'
 sudo -H -u "$USER" bash -c 'helm plugin install https://github.com/jkroepke/helm-secrets > /dev/null 2> /dev/null'
 
@@ -297,11 +296,10 @@ fi
 sudo apt-get update && sudo apt-get install google-cloud-sdk
 
 echo "Chowning home directory to $USER"
-sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"USER"/.gitconfig
+sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"$USER"/.gitconfig
 sudo chown -R "$USER" /home/"$USER"
 
 echo "Installing krew"
-# TODO: verify that this works
 sudo -H -u "$USER" bash -c 'cd "$(mktemp -d)" && export PATH="${PATH}:${HOME}/.krew/bin" && \
 curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" && \
 tar zxvf krew.tar.gz && KREW=./krew-"$(uname | tr "[:upper:]" "[:lower:]")"_"$(uname -m | sed -e "s/x86_64/amd64/" -e "s/arm.*$/arm/")" && \
