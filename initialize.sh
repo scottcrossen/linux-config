@@ -119,6 +119,7 @@ sudo apt-get -qq install -y \
   brightnessctl \
   xfce4-terminal \
   fzf \
+  unzip \
   jq > /dev/null
 
 if [ "$HEADLESS" != "true" ]; then
