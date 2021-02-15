@@ -118,6 +118,7 @@ sudo apt-get -qq install -y \
   arandr \
   brightnessctl \
   xfce4-terminal \
+  fzf \
   jq > /dev/null
 
 if [ "$HEADLESS" != "true" ]; then
