@@ -298,7 +298,6 @@ fi
 sudo apt-get update && sudo apt-get install google-cloud-sdk
 
 echo "Chowning home directory to $USER"
-sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"$USER"/.gitconfig
 sudo chown -R "$USER" /home/"$USER"
 
 echo "Installing krew"
@@ -309,5 +308,9 @@ tar zxvf krew.tar.gz && KREW=./krew-"$(uname | tr "[:upper:]" "[:lower:]")"_"$(u
 "$KREW" install ctx && \
 "$KREW" install ns && \
 "$KREW" install oidc-login'
+
+echo "Adding .gitconfig"
+sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"$USER"/.gitconfig
+sudo chown "$USER" /home/"$USER"/.gitconfig
 
 echo "Finished"
