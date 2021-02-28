@@ -120,6 +120,7 @@ sudo apt-get -qq install -y \
   xfce4-terminal \
   fzf \
   unzip \
+  dnsmasq \
   jq > /dev/null
 
 if [ "$HEADLESS" != "true" ]; then
