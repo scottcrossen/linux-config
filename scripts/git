@@ -12,5 +12,11 @@ if [ "$PROTECTED_BRANCH" == "$CURRENT_BRANCH" ] && [ "$1" == "push" ]; then
     exit 1
 fi
 
+if git diff "$CURRENT_BRANCH" "$PROTECTED_BRANCH" | grep "PRIVATE KEY"; then
+    echo "You're about to push a diff with sensitive keywords. If this is really what you want then run:"
+    printf "\n/usr/bin/git ${@:1}\n\n"
+    exit 1
+fi
+
 /usr/bin/git "${@:1}"
 exit $?
