@@ -120,6 +120,7 @@ sudo apt-get -qq install -y \
   brightnessctl \
   xfce4-terminal \
   fzf \
+  dnsutils \
   unzip \
   jq > /dev/null
 
