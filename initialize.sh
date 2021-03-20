@@ -112,7 +112,6 @@ sudo apt-get -qq install -y \
   qemu-system \
   libvirt-clients \
   libvirt-daemon-system \
-  libnss3-tool \
   xvfb \
   xbase-clients \
   python3-psutil \
