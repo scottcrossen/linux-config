@@ -121,6 +121,7 @@ sudo apt-get -qq install -y \
   fzf \
   dnsutils \
   unzip \
+  inotify-tools \
   make \
   libnss3-tools \
   jq > /dev/null
