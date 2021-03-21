@@ -121,6 +121,7 @@ sudo apt-get -qq install -y \
   fzf \
   dnsutils \
   unzip \
+  make \
   jq > /dev/null
 
 if [ "$HEADLESS" != "true" ]; then
