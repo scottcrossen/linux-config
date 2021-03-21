@@ -122,6 +122,7 @@ sudo apt-get -qq install -y \
   dnsutils \
   unzip \
   make \
+  libnss3-tools \
   jq > /dev/null
 
 if [ "$HEADLESS" != "true" ]; then
