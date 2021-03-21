@@ -71,6 +71,9 @@ if [ "$(sudo passwd --status "$USER" | awk '{print $2}')" != "P" ]; then
   sudo passwd "$USER"
 fi
 
+echo "Setting timezone"
+sudo timedatectl set-timezone America/Los_Angeles
+
 echo "Copying and chowning files"
 mkdir -p linux-config
 ARTIFACT_DIR="$(pwd)"/linx-config
