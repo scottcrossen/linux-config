@@ -1,0 +1,66 @@
+#!/bin/bash
+#author scottcrossen
+
+# Accept filenames as arguments and infer the operation based on path
+# Decrypt an encrypted filename argument
+if echo "$1" | grep -q encrypted; then
+  SOPS_FILE="$1"
+  echo decrypting "$SOPS_FILE"
+  sops -d "$SOPS_FILE" > "$SOPS_FILE".dec
+  BASE_DIR="$(dirname "$SOPS_FILE".dec)"
+  mkdir -p "$BASE_DIR"/../decrypted
+  if [ ! -f "$BASE_DIR"/../decrypted/.gitkeep ]; then
+    touch "$BASE_DIR"/../decrypted/.gitkeep
+    git add "$BASE_DIR"/../decrypted/.gitkeep -f
+  fi
+  if [[ "$2" == "--no-overwrite" ]] && [ ! -f "$BASE_DIR"/../decrypted/"$(basename "$SOPS_FILE")" ]; then
+    cp "$SOPS_FILE".dec "$BASE_DIR"/../decrypted/"$(basename "$SOPS_FILE")"
+  elif [[ "$2" != "--no-overwrite" ]]; then
+    mv "$SOPS_FILE".dec "$BASE_DIR"/../decrypted/"$(basename "$SOPS_FILE")"
+  fi
+# Encrypt a decrypted filename argument
+elif echo "$1" | grep -q decrypted; then
+  SOPS_FILE="$1"
+  BASE_DIR="$(dirname "$SOPS_FILE")"
+  mkdir -p "$BASE_DIR"/../encrypted
+  if [ ! -f "$BASE_DIR"/.gitkeep ]; then
+    touch "$BASE_DIR"/.gitkeep
+    git add "$BASE_DIR"/.gitkeep -f
+  fi
+  ENCRYPTED_FILE="$BASE_DIR"/../encrypted/"$(basename "$SOPS_FILE")"
+  if [ -f "$ENCRYPTED_FILE" ]; then
+    if [ ! -f "$ENCRYPTED_FILE".dec ]; then
+      echo decrypting "$ENCRYPTED_FILE" "(for comparison)"
+      sops -d "$ENCRYPTED_FILE" > "$ENCRYPTED_FILE".dec
+    fi
+    if ! cmp --silent "$ENCRYPTED_FILE".dec "$SOPS_FILE"; then
+      echo "encrypting (found differences) $SOPS_FILE"
+      cp "$SOPS_FILE" "$ENCRYPTED_FILE"
+      sops -e -i "$ENCRYPTED_FILE"
+    else
+      echo "not encrypting (no differences) $SOPS_FILE"
+    fi
+    rm "$ENCRYPTED_FILE".dec
+  else
+    echo "encrypting (new file) $SOPS_FILE"
+    cp "$SOPS_FILE" "$ENCRYPTED_FILE"
+    sops -e -i "$ENCRYPTED_FILE"
+  fi
+else
+  if shopt -q globstar; then
+    saved_globstar=-s
+  else
+    saved_globstar=-u
+  fi
+  shopt -s globstar
+  SOPS_FILES=($(ls ./**/encrypted/*))
+  for SOPS_FILE in "${SOPS_FILES[@]}"; do
+    encdec "$SOPS_FILE" --no-overwrite
+  done
+  SOPS_FILES=($(ls ./**/decrypted/*))
+  for SOPS_FILE in "${SOPS_FILES[@]}"; do
+    encdec "$SOPS_FILE"
+  done
+  shopt $saved_globstar globstar
+fi
+
