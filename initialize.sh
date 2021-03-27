@@ -10,17 +10,19 @@ USER_EMAIL=$3
 ARCH=""
 ETHERNET_INTERFACE=$(ip link show | grep -o 'en[^: ]\+')
 WIFI_INTERFACE=$(ip link show | grep -o 'wlp[^: ]\+')
+BLUE='\033[0;34m'
+NC='\033[0m'
 cd $TEMP_DIR
 
 if [ -z "$USER" ] || [ -z "$USER_FULLNAME" ] || [ -z "$USER_EMAIL" ]; then
-  echo "Usage is: $0 <user> \"<first name> <last name>\" <email>"
+  echo -e "$BLUEUsage is: $0 <user> \"<first name> <last name>\" <email>$NC"
   exit 1
 fi
 
 if [[ $(uname -m) = x86_64 ]]; then
   ARCH="amd64"
 else
-  echo "Unknown architecture \"$(uname -m)\""
+  echo -e "$BLUEUnknown architecture \"$(uname -m)\"$NC"
   exit 1
 fi
 
@@ -32,7 +34,7 @@ for EXTRA_ARG in "${@:4}"; do
   elif [ "$EXTRA_ARG" = "--has_ruby" ]; then
     HAS_RUBY=trie
   else
-    echo "Unknown argument $EXTRA_ARG"
+    echo -e "$BLUEUnknown argument $EXTRA_ARG$NC"
     exit 1
   fi
 done
@@ -58,7 +60,7 @@ function replace_with_user_details {
   done
 }
 
-echo "Creating user $USER"
+echo -e "$BLUECreating user $USER$NC"
 sudo useradd -m $USER > /dev/null 2> /dev/null
 sudo usermod -aG video $USER > /dev/null 2> /dev/null
 groupadd libvert > /dev/null 2> /dev/null
@@ -67,21 +69,21 @@ sudo usermod -aG libvert $USER > /dev/null 2> /dev/null
 sudo usermod -aG sudo $USER > /dev/null 2> /dev/null
 sudo usermod -aG chrome-remote-desktop $USER > /dev/null 2> /dev/null
 if [ "$(sudo passwd --status "$USER" | awk '{print $2}')" != "P" ]; then
-  echo "Setting user password"
+  echo -e "$BLUESetting user password$NC"
   sudo passwd "$USER"
 fi
 
-echo "Setting timezone"
+echo -e "$BLUESetting timezone$NC"
 sudo timedatectl set-timezone America/Los_Angeles
 
-echo "Copying and chowning files"
+echo -e "$BLUECopying and chowning files$NC"
 mkdir -p linux-config
 ARTIFACT_DIR="$(pwd)"/linx-config
 sudo cp -r "$SCRIPT_DIR" "$ARTIFACT_DIR"
 sudo chown -R "$USER" "$ARTIFACT_DIR"
 replace_with_user_details "$ARTIFACT_DIR"
 
-echo "Copying dotfiles"
+echo -e "$BLUECopying dotfiles$NC"
 sudo cp -r "$ARTIFACT_DIR"/home/. ./home/
 sudo cp -r ./home/. /home/"$USER"/
 sudo chmod +x -R /home/"$USER"/.bashrc.d
@@ -90,18 +92,18 @@ sudo chmod +x /home/"$USER"/.xprofile
 # The ssh key has not been added yet. We need to use https for everything
 sudo rm /home/"$USER"/.gitconfig
 
-echo "Copying udev files"
+echo -e "$BLUECopying udev files$NC"
 sudo cp -r "$ARTIFACT_DIR"/udev/. /etc/udev/rules.d
 sudo udevadm control --reload-rules && sudo udevadm trigger
 
-echo "Copying scripts"
+echo -e "$BLUECopying scripts$NC"
 sudo cp -r "$ARTIFACT_DIR"/scripts/. /usr/local/bin
 
-echo "Copying cron jobs"
+echo -e "$BLUECopying cron jobs$NC"
 sudo cp -r "$ARTIFACT_DIR"/cron.d/. /etc/cron.d
 sudo systemctl restart cron
 
-echo "Installing basic packages"
+echo -e "$BLUEInstalling basic packages$NC"
 sudo apt-get -qq update > /dev/null
 sudo apt-get -qq install -y \
   apt-transport-https \
@@ -133,11 +135,11 @@ if [ "$HEADLESS" != "true" ]; then
   sudo apt-get -qq install -y lightdm  > /dev/null
 fi
 
-echo "Installing Google Chrome"
+echo -e "$BLUEInstalling Google Chrome$NC"
 curl -sSLo google-chrome-stable_current_$ARCH.deb https://dl.google.com/linux/direct/google-chrome-stable_current_$ARCH.deb
 sudo apt-get -qq install -y ./google-chrome-stable_current_$ARCH.deb > /dev/null
 
-echo "Installing Git"
+echo -e "$BLUEInstalling Git$NC"
 sudo apt-get -qq install git > /dev/null
 if [ ! -f /home/"$USER"/.ssh/id_rsa ]; then
   echo "Creating ssh key"
@@ -145,13 +147,13 @@ if [ ! -f /home/"$USER"/.ssh/id_rsa ]; then
   echo "TODO: Remember to add public ssh key to GitHub/BitBucket"
 fi
 
-echo "Configuring screen mirroring"
+echo -e "$BLUEConfiguring screen mirroring$NC"
 git clone https://github.com/schlomo/automirror.git -q > /dev/null
 sudo mkdir -p /home/"$USER"/.screenlayout
 sudo mv automirror/automirror.sh /home/"$USER"/.screenlayout/automirror.sh
 sudo chmod +x /home/"$USER"/.screenlayout/*
 
-echo "Installing Docker"
+echo -e "$BLUEInstalling Docker$NC"
 curl -sSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - > /dev/null 2> /dev/null
 sudo add-apt-repository \
   "deb [arch=$ARCH] https://download.docker.com/linux/$(lsb_release -is | awk '{print tolower($0)}') \
@@ -160,23 +162,23 @@ sudo add-apt-repository \
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y docker-ce docker-ce-cli containerd.io > /dev/null
 sudo usermod -aG docker $USER
 
-echo "Installing docker compose"
+echo -e "$BLUEInstalling docker compose$NC"
 # Personally, I think docker compose is stupid. However, some repositories think we need it for some reason.
 sudo curl -sSL "https://github.com/docker/compose/releases/download/1.27.4/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
 sudo chmod +x /usr/local/bin/docker-compose
 
-echo "Installing Kubernetes"
+echo -e "$BLUEInstalling Kubernetes$NC"
 curl -sSL https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add - > /dev/null 2> /dev/null
 if [ ! -f /etc/apt/sources.list.d/kubernetes.list ] || ! grep -q "xenial" /etc/apt/sources.list.d/kubernetes.list; then
   echo "deb https://apt.kubernetes.io/ kubernetes-xenial main" | sudo tee -a /etc/apt/sources.list.d/kubernetes.list > /dev/null
 fi
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y kubectl > /dev/null
 
-echo "Installing concourse fly CLI"
+echo -e "$BLUEInstalling concourse fly CLI"
 curl -sSL https://api.github.com/repos/concourse/concourse/releases/latest | grep "browser_download_url.*fly.*$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCH.tgz\"" | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo fly.tgz
 sudo tar -C /usr/local/bin -zxvf fly.tgz > /dev/null
 
-echo "Installing Minikube"
+echo -e "$BLUEInstalling Minikube$NC"
 curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-$ARCH \
   && chmod +x minikube
 mkdir -p /usr/local/bin/
@@ -185,12 +187,12 @@ sudo cp "$ARTIFACT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.se
 sudo systemctl daemon-reload
 sudo systemctl enable minikube.service
 
-echo "Installing sops"
+echo -e "$BLUEInstalling sops$NC"
 curl -sSL https://api.github.com/repos/mozilla/sops/releases/latest  | grep "browser_download_url.*$(uname -s | tr '[:upper:]' '[:lower:]')"  | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo sops
 sudo chmod +x sops
 sudo install sops /usr/local/bin/
 
-echo "Installing Helm"
+echo -e "$BLUEInstalling Helm$NC"
 curl -fsSL -o get_helm.sh https://raw.githubusercontent.com/helm/helm/master/scripts/get-helm-3
 sudo chmod 700 get_helm.sh
 ./get_helm.sh > /dev/null
@@ -200,17 +202,17 @@ sudo install helmfile /usr/local/bin/
 sudo -H -u "$USER" bash -c 'helm plugin install https://github.com/databus23/helm-diff > /dev/null 2> /dev/null'
 sudo -H -u "$USER" bash -c 'helm plugin install https://github.com/jkroepke/helm-secrets > /dev/null 2> /dev/null'
 
-echo "Installing HashiCorp Vault"
+echo -e "$BLUEInstalling HashiCorp Vault$NC"
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - > /dev/null 2> /dev/null
 sudo apt-add-repository --yes --update "deb [arch=amd64] https://apt.releases.hashicorp.com $(lsb_release -cs) main"
 sudo apt-get -qq update > /dev/null
 sudo apt-get -qq install -y vault > /dev/null
 
-echo "Installing I3"
+echo -e "$BLUEInstalling I3$NC"
 if [ "$HEADLESS" != "true" ]; then
-  sudo apt-get -qq install i3
+  sudo apt-get -qq install -y i3
 else
-  sudo DEBIAN_FRONTEND=noninteractive apt install --assume-yes -qq i3 desktop-base
+  sudo DEBIAN_FRONTEND=noninteractive apt-get -qq install -y i3 desktop-base
 fi
 sudo update-alternatives --install /usr/bin/x-session-manager x-session-manager /usr/bin/i3 60
 if [ "$HEADLESS" != "true" ]; then
@@ -220,7 +222,7 @@ sudo cp "$ARTIFACT_DIR"/systemd/lock.service /lib/systemd/system/lock.service
 sudo systemctl daemon-reload
 sudo systemctl start lock.service
 
-echo "Installing Visual Studio Code"
+echo -e "$BLUEInstalling Visual Studio Code$NC"
 if [ ! -f /etc/apt/sources.list.d/vscode.list ] && ! grep -q "vscode" /etc/apt/sources.list; then
   curl -sSL https://packages.microsoft.com/keys/microsoft.asc | sudo apt-key add - > /dev/null 2> /dev/null
   sudo add-apt-repository "deb [arch=$ARCH] https://packages.microsoft.com/repos/vscode stable main"
@@ -228,7 +230,7 @@ if [ ! -f /etc/apt/sources.list.d/vscode.list ] && ! grep -q "vscode" /etc/apt/s
   sudo rm /etc/apt/sources.list.d/vscode.list
 fi
 
-echo "Installing Chrome Remote Desktop"
+echo -e "$BLUEInstalling Chrome Remote Desktop$NC"
 curl -sSLO https://dl.google.com/linux/direct/chrome-remote-desktop_current_$ARCH.deb
 sudo dpkg --install chrome-remote-desktop_current_$ARCH.deb > /dev/null
 sudo apt-get -qq install --assume-yes --fix-broken
@@ -239,17 +241,17 @@ if [ "$HEADLES" = "true" ]; then
 fi
 echo "TODO: Remember to add this computer to chrome remote desktop list at https://remotedesktop.google.com/headless"
 
-echo "Installing Golang"
+echo -e "$BLUEInstalling Golang$NC"
 VERSION_REGEX='\"version\":\s*\"([^"]*)\"'
 [[ $(curl -sSL 'https://golang.org/dl/?mode=json') =~ $VERSION_REGEX ]]
 CURRENT_VERSION="${BASH_REMATCH[1]}"
 curl -sSLO https://dl.google.com/go/$CURRENT_VERSION.linux-$ARCH.tar.gz
 sudo tar -C /usr/local -xzf $CURRENT_VERSION.linux-$ARCH.tar.gz
 
-echo "Installing Rust"
+echo -e "$BLUEInstalling Rust$NC"
 sudo -H -u "$USER" bash -c 'curl -sSL --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sed "s/main "$@"/main "$@" -y > \/dev\/null 2> \/dev\/null/g" | sh > /dev/null'
 
-echo "Installing Ansible"
+echo -e "$BLUEInstalling Ansible$NC"
 if ! grep -q "ansible" /etc/apt/sources.list; then
   sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
   sudo add-apt-repository "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main"
@@ -257,7 +259,7 @@ if ! grep -q "ansible" /etc/apt/sources.list; then
 fi
 sudo apt-get -qq install -y ansible
 
-echo "Installing Yubikey"
+echo -e "$BLUEInstalling Yubikey$NC"
 if [ -z "$(sudo apt-cache search yubikey-manager)" ]; then
   sudo apt-add-repository --yes --update ppa:yubico/stable
   sudo apt-get -qq update > /dev/null
@@ -272,16 +274,16 @@ if [ -z "$(sudo apt-cache search yubico-piv-tool)" ]; then
 fi
 sudo apt-get -qq install -y yubico-piv-tool
 
-echo "Installing Protobuf"
+echo -e "$BLUEInstalling Protobuf$NC"
 sudo apt-get -qq install -y protobuf-compiler
 
-echo "Installing Javascript"
+echo -e "$BLUEInstalling Javascript$NC"
 if [ ! -d /home/"$USER"/.nvm ]; then
   sudo mkdir -p /home/"$USER"/.nvm
   sudo git clone https://github.com/nvm-sh/nvm.git /home/"$USER"/.nvm -q
 fi
 
-echo "Installing Terraform"
+echo -e "$BLUEInstalling Terraform$NC"
 if [ ! -d /home/"$USER"/.tfenv ]; then
   sudo mkdir -p /home/"$USER"/.tfenv
   sudo git clone https://github.com/tfutils/tfenv.git /home/"$USER"/.tfenv -q
@@ -289,14 +291,14 @@ if [ ! -d /home/"$USER"/.tfenv ]; then
 fi
 
 if [ "$HAS_RUBY" = "true" ]; then
-  echo "Installing Ruby"
+  echo -e "$BLUEInstalling Ruby$NC"
   gpg --keyserver hkp://pool.sks-keyservers.net --recv-keys 409B6B1796C275462A1703113804BB82D39DC0E3 7D2BAF1CF37B13E2069D6956105BD0E739499BDB > /dev/null 2> /dev/null
   curl -sSL https://get.rvm.io  | sed 's/rvm_install "$@"/rvm_install "$@" > \/dev\/null 2> \/dev\/null/g' | bash -s stable --ruby > /dev/null
   source /usr/local/rvm/scripts/rvm
   rvm rvmrc warning ignore allGemfiles
 fi
 
-echo "Installing gcloud"
+echo -e "$BLUEInstalling gcloud$NC"
 
 if [ ! -f /etc/apt/sources.list.d/google-cloud-sdk.list ]; then
   echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
@@ -304,10 +306,10 @@ if [ ! -f /etc/apt/sources.list.d/google-cloud-sdk.list ]; then
 fi
 sudo apt-get update && sudo apt-get install google-cloud-sdk
 
-echo "Chowning home directory to $USER"
+echo -e "$BLUEChowning home directory to $USER$NC"
 sudo chown -R "$USER" /home/"$USER"
 
-echo "Installing krew"
+echo -e "$BLUEInstalling krew$NC"
 sudo -H -u "$USER" bash -c 'cd "$(mktemp -d)" && export PATH="${PATH}:${HOME}/.krew/bin" && \
 curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" && \
 tar zxvf krew.tar.gz && KREW=./krew-"$(uname | tr "[:upper:]" "[:lower:]")"_"$(uname -m | sed -e "s/x86_64/amd64/" -e "s/arm.*$/arm/")" && \
@@ -316,8 +318,8 @@ tar zxvf krew.tar.gz && KREW=./krew-"$(uname | tr "[:upper:]" "[:lower:]")"_"$(u
 "$KREW" install ns && \
 "$KREW" install oidc-login'
 
-echo "Adding .gitconfig"
+echo -e "$BLUEAdding .gitconfig$NC"
 sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"$USER"/.gitconfig
 sudo chown "$USER" /home/"$USER"/.gitconfig
 
-echo "Finished"
+echo -e "$BLUEFinished$NC"
