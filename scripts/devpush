@@ -1,0 +1,20 @@
+#!/bin/bash
+#author scottcrossen
+
+ORIGINAL_BRANCH="$(git rev-parse --abbrev-ref HEAD)"
+UNADDED_FILES="$(git ls-files . --exclude-standard -odm --full-name)"
+if [[ "$(git rev-parse --abbrev-ref HEAD)" != "$USER"-dev ]]; then
+  git branch -D "$USER"-dev
+  git checkout -b "$USER"-dev
+fi
+if [[ ! -z "$UNADDED_FILES" ]]; then
+  git add .
+  git commit -m "temp commit"
+fi
+git push origin +"$USER"-dev
+if [[ ! -z "$UNADDED_FILES" ]]; then
+  git reset --soft HEAD^
+  git reset HEAD .
+fi
+git checkout "$ORIGINAL_BRANCH"
+git status
