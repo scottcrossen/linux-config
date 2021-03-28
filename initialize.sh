@@ -183,9 +183,9 @@ curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/mini
   && chmod +x minikube
 mkdir -p /usr/local/bin/
 sudo install minikube /usr/local/bin/
-sudo cp "$ARTIFACT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
-sudo systemctl daemon-reload
-sudo systemctl enable minikube.service
+# sudo cp "$ARTIFACT_DIR"/systemd/minikube.service /lib/systemd/system/minikube.service
+# sudo systemctl daemon-reload
+# sudo systemctl enable minikube.service
 
 echo -e "$BLUEInstalling sops$NC"
 curl -sSL https://api.github.com/repos/mozilla/sops/releases/latest  | grep "browser_download_url.*$(uname -s | tr '[:upper:]' '[:lower:]')"  | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo sops
