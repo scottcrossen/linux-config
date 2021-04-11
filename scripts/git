@@ -30,18 +30,18 @@ fi
 
 /usr/bin/git "${@:1}"
 EXIT_CODE=$?
-if [ "$1" == "push" ]; then
-  GIT_ROOT="$(git rev-parse --show-toplevel)"
-  if [[ -f "$GIT_ROOT"/.webhooks ]]; then
-    echo "Running webhooks"
-    cat "$GIT_ROOT"/.githooks | while read LINE; do
-      if [[ -f "$LINE" ]]; then
-        echo "Running $LINE:"
-        ./$LINE
-        echo ""
-      fi
-    done
-  fi
-fi
+#if [ "$1" == "push" ]; then
+#  GIT_ROOT="$(git rev-parse --show-toplevel)"
+#  if [[ -f "$GIT_ROOT"/.githooks ]]; then
+#    echo "Running webhooks"
+#    cat "$GIT_ROOT"/.githooks | while read LINE; do
+#      if [[ -f "$LINE" ]]; then
+#        echo "Running $LINE:"
+#        ./$LINE
+#        echo ""
+#      fi
+#    done
+#  fi
+#fi
 
 exit "$EXIT_CODE"

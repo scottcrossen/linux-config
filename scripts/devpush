@@ -15,7 +15,19 @@ if [[ ! -z "$UNADDED_FILES" ]]; then
   git add .
   git commit -m "temp commit"
 fi
-git push origin +"$USER"-dev
+/usr/bin/git push origin +"$USER"-dev
+GIT_ROOT="$(git rev-parse --show-toplevel)"
+echo "Checking for git hooks"
+if [[ -f "$GIT_ROOT"/.githooks ]]; then
+  echo "Running webhooks"
+  cat "$GIT_ROOT"/.githooks | while read LINE; do
+    if [[ -f "$LINE" ]]; then
+      echo "Running $LINE:"
+      ./$LINE
+      echo ""
+    fi
+  done
+fi
 if [[ ! -z "$UNADDED_FILES" ]]; then
   git reset --soft HEAD^
   git reset HEAD .
