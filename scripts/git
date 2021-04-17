@@ -1,12 +1,8 @@
 #!/bin/bash
 #author scottcrossen
 
-if ! /usr/bin/git rev-parse --git-dir > /dev/null; then
-  exit
-fi
-
 PROTECTED_BRANCH='master'
-if [ -d .git ]; then
+if /usr/bin/git rev-parse --git-dir > /dev/null 2> /dev/null; then
   CURRENT_BRANCH=$(/usr/bin/git symbolic-ref HEAD | sed -e 's/refs\/heads\///g')
 fi
 
