@@ -4,21 +4,24 @@
 PROTECTED_BRANCH='master'
 if /usr/bin/git rev-parse --git-dir > /dev/null 2> /dev/null; then
   CURRENT_BRANCH=$(/usr/bin/git symbolic-ref HEAD | sed -e 's/refs\/heads\///g')
+  if [[ "$(/usr/bin/git config --local remote.origin.url | sed 's/^.*[:\/]\([a-zA-Z0-9]*\)\/[a-zA-Z0-9-]*\.git/\1/g')" == "###USER###" ]]; then
+    REPO_IS_OWNED="true"
+  fi
 fi
 
-if [ "$PROTECTED_BRANCH" == "$CURRENT_BRANCH" ] && [ "$1" == "commit" ]; then
+if [ "$PROTECTED_BRANCH" == "$CURRENT_BRANCH" ] && [ "$1" == "commit" ] && [[ "$REPO_IS_OWNED" != "true" ]]; then
     echo "You're about to commit while on local master. If this is really what you want then run:"
     printf "\n/usr/bin/git ${@:1}\n\n"
     exit 1
 fi
 
-if [ "$PROTECTED_BRANCH" == "$CURRENT_BRANCH" ] && [ "$1" == "push" ]; then
+if [ "$PROTECTED_BRANCH" == "$CURRENT_BRANCH" ] && [ "$1" == "push" ] && [[ "$REPO_IS_OWNED" != "true" ]]; then
     echo "You're about to push while on local master. If this is really what you want then run:"
     printf "\n/usr/bin/git ${@:1}\n\n"
     exit 1
 fi
 
-if [ "$CURRENT_BRANCH" != "$PROTECTED_BRANCH" ] && [ "$1" == "push" ] && git diff "$CURRENT_BRANCH" "$PROTECTED_BRANCH" | grep -q "PRIVATE KEY"; then
+if [ "$CURRENT_BRANCH" != "$PROTECTED_BRANCH" ] && [ "$1" == "push" ] && git diff "$CURRENT_BRANCH" "$PROTECTED_BRANCH" | grep -q "PRIVATE KEY" && [[ "$REPO_IS_OWNED" != "true" ]]; then
     echo "You're about to push a diff with sensitive keywords. If this is really what you want then run:"
     printf "\n/usr/bin/git ${@:1}\n\n"
     exit 1
