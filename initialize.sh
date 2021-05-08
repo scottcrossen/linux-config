@@ -281,6 +281,9 @@ echo -e "${BLUE}Installing Javascript$NC"
 if [ ! -d /home/"$USER"/.nvm ]; then
   sudo mkdir -p /home/"$USER"/.nvm
   sudo git clone https://github.com/nvm-sh/nvm.git /home/"$USER"/.nvm -q
+  nvm install --lts
+  nvm use --lts
+  npm install --global yarn
 fi
 
 echo -e "${BLUE}Installing Terraform$NC"
