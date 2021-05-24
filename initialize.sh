@@ -129,6 +129,7 @@ sudo apt-get -qq install -y \
   inotify-tools \
   make \
   libnss3-tools \
+  build-essential \
   jq > /dev/null
 
 if [ "$HEADLESS" != "true" ]; then
@@ -250,6 +251,7 @@ sudo tar -C /usr/local -xzf $CURRENT_VERSION.linux-$ARCH.tar.gz
 
 echo -e "${BLUE}Installing Rust$NC"
 sudo -H -u "$USER" bash -c 'curl -sSL --proto "=https" --tlsv1.2 -sSf https://sh.rustup.rs | sed "s/main "$@"/main "$@" -y > \/dev\/null 2> \/dev\/null/g" | sh > /dev/null'
+sudo -H -u "$USER" bash -c "rustup install stable"
 
 echo -e "${BLUE}Installing Ansible$NC"
 if ! grep -q "ansible" /etc/apt/sources.list; then
