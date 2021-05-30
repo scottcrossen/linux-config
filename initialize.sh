@@ -110,6 +110,8 @@ sudo apt-get -qq install -y \
   gnupg \
   gnupg2 \
   curl \
+  cmake \
+  libssl-dev \
   vim \
   ca-certificates \
   gnupg-agent \
@@ -279,16 +281,6 @@ sudo apt-get -qq install -y yubico-piv-tool
 echo -e "${BLUE}Installing Protobuf$NC"
 sudo apt-get -qq install -y protobuf-compiler
 
-echo -e "${BLUE}Installing Javascript$NC"
-if [ ! -d /home/"$USER"/.nvm ]; then
-  sudo mkdir -p /home/"$USER"/.nvm
-  sudo git clone https://github.com/nvm-sh/nvm.git /home/"$USER"/.nvm -q
-  sudo -H -u "$USER" bash -c "source /home/$USER/.nvm/nvm.sh && \
-  nvm install --lts && \
-  nvm use --lts && \
-  npm install --global yarn"
-fi
-
 echo -e "${BLUE}Installing Terraform$NC"
 if [ ! -d /home/"$USER"/.tfenv ]; then
   sudo mkdir -p /home/"$USER"/.tfenv
@@ -314,6 +306,16 @@ sudo apt-get update && sudo apt-get install google-cloud-sdk
 
 echo -e "${BLUE}Chowning home directory to $USER$NC"
 sudo chown -R "$USER" /home/"$USER"
+
+echo -e "${BLUE}Installing Javascript$NC"
+if [ ! -d /home/"$USER"/.nvm ]; then
+  sudo mkdir -p /home/"$USER"/.nvm
+  sudo git clone https://github.com/nvm-sh/nvm.git /home/"$USER"/.nvm -q
+  sudo -H -u "$USER" bash -c "source /home/$USER/.nvm/nvm.sh && \
+  nvm install --lts && \
+  nvm use --lts && \
+  npm install --global yarn"
+fi
 
 echo -e "${BLUE}Installing krew$NC"
 sudo -H -u "$USER" bash -c 'cd "$(mktemp -d)" && export PATH="${PATH}:${HOME}/.krew/bin" && \
