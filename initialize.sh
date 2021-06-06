@@ -311,6 +311,7 @@ echo -e "${BLUE}Installing Javascript$NC"
 if [ ! -d /home/"$USER"/.nvm ]; then
   sudo mkdir -p /home/"$USER"/.nvm
   sudo git clone https://github.com/nvm-sh/nvm.git /home/"$USER"/.nvm -q
+  sudo chown -R "$USER" /home/"$USER"/.nvm
   sudo -H -u "$USER" bash -c "source /home/$USER/.nvm/nvm.sh && \
   nvm install --lts && \
   nvm use --lts && \
