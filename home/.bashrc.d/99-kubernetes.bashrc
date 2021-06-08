@@ -8,3 +8,5 @@ alias kubectx='kubectl ctx'
 alias kubens='kubectl ns'
 alias kubelogin='kubectl oidc-login'
 alias krew='kubectl krew'
+
+export KUBECONFIG=$HOME/.kube/config:$(ls -A1 $HOME/.kube/*.config.yml | tr '\n' :)
