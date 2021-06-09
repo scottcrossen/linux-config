@@ -32,7 +32,7 @@ for EXTRA_ARG in "${@:4}"; do
   if [ "$EXTRA_ARG" = "--headless" ]; then
     HEADLESS=true
   elif [ "$EXTRA_ARG" = "--has_ruby" ]; then
-    HAS_RUBY=trie
+    HAS_RUBY=true
   else
     echo -e "${BLUE}Unknown argument $EXTRA_ARG$NC"
     exit 1
