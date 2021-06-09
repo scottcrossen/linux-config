@@ -132,6 +132,7 @@ sudo apt-get -qq install -y \
   make \
   libnss3-tools \
   build-essential \
+  ykcs11 \
   jq > /dev/null
 
 if [ "$HEADLESS" != "true" ]; then
@@ -271,12 +272,15 @@ fi
 sudo apt-get -qq install -y yubikey-manager libpam-yubico
 if [ -z "$(sudo apt-cache search yubico-piv-tool)" ]; then
   # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=926551
-  curl -sSlO http://http.us.debian.org/debian/pool/main/y/yubico-piv-tool/libykpiv2_2.1.1-3_amd64.deb
-  sudo dpkg -i --force-depends libykpiv2_2.1.1-3_amd64.deb  > /dev/null
-  curl -sSLO http://http.us.debian.org/debian/pool/main/y/yubico-piv-tool/yubico-piv-tool_2.1.1-3_amd64.deb
-  sudo dpkg -i --force-depends yubico-piv-tool_2.1.1-3_amd64.deb  > /dev/null
+  # curl -sSlO http://http.us.debian.org/debian/pool/main/y/yubico-piv-tool/libykpiv2_2.1.1-3_amd64.deb
+  # sudo dpkg -i --force-depends libykpiv2_2.1.1-3_amd64.deb  > /dev/null
+  # curl -sSLO http://http.us.debian.org/debian/pool/main/y/yubico-piv-tool/yubico-piv-tool_2.1.1-3_amd64.deb
+  # sudo dpkg -i --force-depends yubico-piv-tool_2.1.1-3_amd64.deb  > /dev/null
 fi
 sudo apt-get -qq install -y yubico-piv-tool
+if [ ! -f /usr/lib/libykcs11.so ]; then
+  sudo ln -s /usr/lib/x86_64-linux-gnu/libykcs11.so /usr/lib/libykcs11.so
+fi
 
 echo -e "${BLUE}Installing Protobuf$NC"
 sudo apt-get -qq install -y protobuf-compiler
