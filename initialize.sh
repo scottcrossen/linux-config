@@ -219,9 +219,9 @@ else
   sudo DEBIAN_FRONTEND=noninteractive apt-get -qq install -y i3 desktop-base
 fi
 sudo update-alternatives --install /usr/bin/x-session-manager x-session-manager /usr/bin/i3 60
-if [ "$HEADLESS" != "true" ]; then
-  sudo dpkg-reconfigure lightdm
-fi
+#if [ "$HEADLESS" != "true" ]; then
+#  sudo dpkg-reconfigure lightdm
+#fi
 sudo cp "$ARTIFACT_DIR"/systemd/lock.service /lib/systemd/system/lock.service
 sudo systemctl daemon-reload
 sudo systemctl start lock.service
