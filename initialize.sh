@@ -271,6 +271,7 @@ if [ -z "$(sudo apt-cache search yubikey-manager)" ]; then
 fi
 sudo apt-get -qq install -y yubikey-manager libpam-yubico
 if [ -z "$(sudo apt-cache search yubico-piv-tool)" ]; then
+  echo "Fixing yubikey dependencies"
   # https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=926551
   # curl -sSlO http://http.us.debian.org/debian/pool/main/y/yubico-piv-tool/libykpiv2_2.1.1-3_amd64.deb
   # sudo dpkg -i --force-depends libykpiv2_2.1.1-3_amd64.deb  > /dev/null
@@ -301,12 +302,18 @@ if [ "$HAS_RUBY" = "true" ]; then
 fi
 
 echo -e "${BLUE}Installing gcloud$NC"
-
 if [ ! -f /etc/apt/sources.list.d/google-cloud-sdk.list ]; then
   echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
   curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
 fi
 sudo apt-get update && sudo apt-get install google-cloud-sdk
+
+echo -e "${BLUE}Installing aws$NC"
+if [ -z "$(which aws-cli)" ]; then
+  curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+  unzip awscliv2.zip
+  sudo ./aws/install
+fi
 
 echo -e "${BLUE}Chowning home directory to $USER$NC"
 sudo chown -R "$USER" /home/"$USER"
