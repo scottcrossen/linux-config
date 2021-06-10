@@ -1,7 +1,7 @@
 #!/bin/bash
 #author scottcrossen
 
-echo "Setting script variables"
+echo "Setting script variables in base script"
 SCRIPT_DIR="$(pwd)"/"${BASH_SOURCE%/*}"
 TEMP_DIR=$(mktemp -d)
 USER=${1:-$USER}
