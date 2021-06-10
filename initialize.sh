@@ -80,7 +80,7 @@ echo -e "${BLUE}Copying and chowning files$NC"
 mkdir -p linux-config
 ARTIFACT_DIR="$(pwd)"/linx-config
 sudo cp -r "$SCRIPT_DIR" "$ARTIFACT_DIR"
-sudo chown -R "$USER" "$ARTIFACT_DIR"
+sudo chown -R "$USER":"$USER" "$ARTIFACT_DIR"
 replace_with_user_details "$ARTIFACT_DIR"
 
 echo -e "${BLUE}Copying dotfiles$NC"
@@ -316,13 +316,13 @@ if [ -z "$(which aws)" ]; then
 fi
 
 echo -e "${BLUE}Chowning home directory to $USER$NC"
-sudo chown -R "$USER" /home/"$USER"
+sudo chown -R "$USER":"$USER" /home/"$USER"
 
 echo -e "${BLUE}Installing Javascript$NC"
 if [ ! -d /home/"$USER"/.nvm ]; then
   sudo mkdir -p /home/"$USER"/.nvm
   sudo git clone https://github.com/nvm-sh/nvm.git /home/"$USER"/.nvm -q
-  sudo chown -R "$USER" /home/"$USER"/.nvm
+  sudo chown -R "$USER":"$USER" /home/"$USER"/.nvm
   sudo -H -u "$USER" bash -c "source /home/$USER/.nvm/nvm.sh && \
   nvm install --lts && \
   nvm use --lts && \
@@ -340,6 +340,6 @@ tar zxvf krew.tar.gz && KREW=./krew-"$(uname | tr "[:upper:]" "[:lower:]")"_"$(u
 
 echo -e "${BLUE}Adding .gitconfig$NC"
 sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"$USER"/.gitconfig
-sudo chown "$USER" /home/"$USER"/.gitconfig
+sudo chown "$USER":"$USER" /home/"$USER"/.gitconfig
 
 echo -e "${BLUE}Finished$NC"
