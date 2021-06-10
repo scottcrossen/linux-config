@@ -12,6 +12,7 @@ ETHERNET_INTERFACE=$(ip link show | grep -o 'en[^: ]\+')
 WIFI_INTERFACE=$(ip link show | grep -o 'wlp[^: ]\+')
 BLUE='\033[0;34m'
 NC='\033[0m'
+DISTRIBUTION="$(lsb_release -a | grep --color=never "Distributor" | sed 's/^Distributor\sID:\s*\(\S*\)/\1/g') | awk '{print tolower($0)}'"
 cd $TEMP_DIR
 
 if [ -z "$USER" ] || [ -z "$USER_FULLNAME" ] || [ -z "$USER_EMAIL" ]; then
@@ -257,7 +258,10 @@ sudo -H -u "$USER" bash -c 'curl -sSL --proto "=https" --tlsv1.2 -sSf https://sh
 sudo -H -u "$USER" bash -c "/home/$USER/.cargo/bin/rustup install stable"
 
 echo -e "${BLUE}Installing Ansible$NC"
-if ! grep -q "ansible" /etc/apt/sources.list; then
+if [[ "$DISTRIBUTION" == "ubuntu" ]] && ! ls /etc/apt/sources.list.d | grep -q "ansible" ; then
+  sudo add-apt-repository --yes ppa:ansible/ansible
+  sudo apt-get -qq update > /dev/null
+elif [[ "$DISTRIBUTION" == "debian" ]] && ! grep -q "ansible" /etc/apt/sources.list; then
   sudo apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367
   sudo add-apt-repository "deb http://ppa.launchpad.net/ansible/ansible/ubuntu trusty main"
   sudo apt-get -qq update > /dev/null
