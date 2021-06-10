@@ -4,7 +4,7 @@
 PROTECTED_BRANCH='master'
 if /usr/bin/git rev-parse --git-dir > /dev/null 2> /dev/null; then
   CURRENT_BRANCH=$(/usr/bin/git symbolic-ref HEAD | sed -e 's/refs\/heads\///g')
-  if [[ "$(/usr/bin/git config --local remote.origin.url | sed 's/^.*[:\/]\([a-zA-Z0-9]*\)\/[a-zA-Z0-9-]*\.git/\1/g')" == "###USER###" ]]; then
+  if [[ "$(/usr/bin/git config --local remote.origin.url | sed 's/^.*[:\/]\([a-zA-Z0-9~]*\)\/[a-zA-Z0-9-]*\.git/\1/g')" == "###USER###" ]]; then
     REPO_IS_OWNED="true"
   fi
 fi

@@ -23,3 +23,23 @@ fi
 function ssu {
     ssh $@ -t "bash -ic 'sudo su'"
 }
+
+function pushorigin {
+    if /usr/bin/git rev-parse --git-dir > /dev/null 2> /dev/null; then
+        git add *
+        git commit --amend --no-edit && git push origin +"$(git rev-parse --abbrev-ref HEAD)"
+        return $?
+    else
+        echo "Not a git repository"
+    fi
+}
+
+function pushfork {
+    if /usr/bin/git rev-parse --git-dir > /dev/null 2> /dev/null; then
+        git add *
+        git commit --amend --no-edit && git push fork +"$(git rev-parse --abbrev-ref HEAD)"
+        return $?
+    else
+        echo "Not a git repository"
+    fi
+}
