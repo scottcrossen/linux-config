@@ -309,7 +309,7 @@ fi
 sudo apt-get update && sudo apt-get install google-cloud-sdk
 
 echo -e "${BLUE}Installing aws$NC"
-if [ -z "$(which aws-cli)" ]; then
+if [ -z "$(which aws)" ]; then
   curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
   unzip awscliv2.zip
   sudo ./aws/install
