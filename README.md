@@ -11,3 +11,4 @@ sudo apt-get install -y -qq git; git clone -q https://github.com/scottcrossen/li
 ### Testing
 
 Tested on Debian 10 (buster)
+Tested on Ubuntu 20.04 (focal)
