@@ -9,4 +9,6 @@ alias kubens='kubectl ns'
 alias kubelogin='kubectl oidc-login'
 alias krew='kubectl krew'
 
-export KUBECONFIG=$HOME/.kube/config:$(ls -A1 $HOME/.kube/*.config.yml | tr '\n' :)
+if ls "$HOME/.kube/*.config.yml" > /dev/null 2> /dev/null; then
+    export KUBECONFIG=$HOME/.kube/config:$(ls -A1 $HOME/.kube/*.config.yml | tr '\n' :)
+fi
