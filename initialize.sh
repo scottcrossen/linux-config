@@ -134,6 +134,7 @@ sudo apt-get -qq install -y \
   libnss3-tools \
   build-essential \
   ykcs11 \
+  sshpass \
   jq > /dev/null
 
 if [ "$HEADLESS" != "true" ]; then
