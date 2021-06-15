@@ -194,7 +194,7 @@ sudo install minikube /usr/local/bin/
 # sudo systemctl enable minikube.service
 
 echo -e "${BLUE}Installing sops$NC"
-curl -sSL https://api.github.com/repos/mozilla/sops/releases/latest  | grep "browser_download_url.*$(uname -s | tr '[:upper:]' '[:lower:]')"  | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo sops
+curl -sSL https://api.github.com/repos/mozilla/sops/releases/latest | grep "browser_download_url.*$(uname -s | tr '[:upper:]' '[:lower:]')"  | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo sops
 sudo chmod +x sops
 sudo install sops /usr/local/bin/
 
