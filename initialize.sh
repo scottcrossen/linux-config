@@ -304,6 +304,7 @@ if [ "$HAS_RUBY" = "true" ]; then
   curl -sSL https://get.rvm.io  | sed 's/rvm_install "$@"/rvm_install "$@" > \/dev\/null 2> \/dev\/null/g' | bash -s stable --ruby > /dev/null
   source /usr/local/rvm/scripts/rvm
   rvm rvmrc warning ignore allGemfiles
+  sudo touch /home/"$HOME"/.rvmrc
 fi
 
 echo -e "${BLUE}Installing gcloud$NC"
