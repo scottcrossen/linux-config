@@ -120,6 +120,7 @@ sudo apt-get -qq install -y \
   qemu-system \
   libvirt-clients \
   libvirt-daemon-system \
+  pkg-config \
   xvfb \
   xbase-clients \
   python3-psutil \
