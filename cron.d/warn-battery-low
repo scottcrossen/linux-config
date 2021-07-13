@@ -1,0 +1,1 @@
+*/15 * * * * ###USER### /usr/local/bin/warn-battery-low

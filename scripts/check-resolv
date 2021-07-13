@@ -1,0 +1,16 @@
+#!/bin/bash
+#author scottcrossen
+
+if [ "$EUID" -ne 0 ]
+  then echo "Please run as root"
+  exit 1
+fi
+
+LAST_RESOLV=/tmp/resolv_watcher/resolv.conf
+RESOLV=/etc/resolv.conf
+
+if [[ ! -f "$LAST_RESOLV" ]] || [[ cmp --silent "$LAST_RESOLV" "$RESOLV" ]]; then
+  # We're most likely on a VPN now
+  systemctl restart docker
+  cp "$RESOLV" "$LAST_RESOLV"
+fi

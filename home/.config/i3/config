@@ -156,10 +156,10 @@ bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5% && ki
 bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle && killall -SIGUSR1 i3status
 
 # Screen brightness controls
-bindsym $mod+F12 exec increase_backlight
-bindsym $mod+F11 exec decrease_backlight
-bindsym XF86MonBrightnessUp exec increase_backlight
-bindsym XF86MonBrightnessDown exec decrease_backlight
+bindsym $mod+F12 exec increase-backlight
+bindsym $mod+F11 exec decrease-backlight
+bindsym XF86MonBrightnessUp exec increase-backlight
+bindsym XF86MonBrightnessDown exec decrease-backlight
 
 # Use for another monitor
 bindsym mod4+mod1+p exec present

@@ -98,9 +98,11 @@ sudo cp -r "$ARTIFACT_DIR"/udev/. /etc/udev/rules.d
 sudo udevadm control --reload-rules && sudo udevadm trigger
 
 echo -e "${BLUE}Copying scripts$NC"
+sudo rm /usr/local/bin/decrease_backlight /usr/local/bin/increase_backlight /usr/local/bin/list_backlight /usr/local/bin/warn_battery_low  > /dev/null 2> /dev/null || true;
 sudo cp -r "$ARTIFACT_DIR"/scripts/. /usr/local/bin
 
 echo -e "${BLUE}Copying cron jobs$NC"
+sudo rm /etc/cron.d/warn_battery_low > /dev/null 2> /dev/null || true;
 sudo cp -r "$ARTIFACT_DIR"/cron.d/. /etc/cron.d
 sudo systemctl restart cron
 
