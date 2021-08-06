@@ -27,5 +27,6 @@ if [ -d "$HOME/.local/bin" ]; then
   export PATH="$HOME/.local/bin:$PATH"
 fi
 
-HISTSIZE=20000
-HISTFILESIZE=20000
+export HISTSIZE=20000
+export HISTFILESIZE=20000
+export TRACK_REVISION="${TRACK_REVISION:-"$USER"-dev}"

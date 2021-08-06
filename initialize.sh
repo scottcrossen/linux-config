@@ -138,6 +138,7 @@ sudo apt-get -qq install -y \
   build-essential \
   ykcs11 \
   sshpass \
+  firefox-esr \
   jq > /dev/null
 
 if [ "$HEADLESS" != "true" ]; then
