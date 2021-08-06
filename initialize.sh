@@ -109,6 +109,7 @@ sudo systemctl restart cron
 echo -e "${BLUE}Installing basic packages$NC"
 sudo apt-get -qq update > /dev/null
 sudo apt-get -qq install -y \
+  acpi \
   apt-transport-https \
   gnupg \
   gnupg2 \
@@ -347,6 +348,14 @@ tar zxvf krew.tar.gz && KREW=./krew-"$(uname | tr "[:upper:]" "[:lower:]")"_"$(u
 "$KREW" install ctx && \
 "$KREW" install ns && \
 "$KREW" install oidc-login'
+
+echo -e "${BLUE}Installing element$NC"
+sudo wget -O /usr/share/keyrings/riot-im-archive-keyring.gpg https://packages.riot.im/debian/riot-im-archive-keyring.gpg
+if [[ ! -f /etc/apt/sources.list.d/riot-im.list ]] || ! cat /etc/apt/sources.list.d/riot-im.list | grep -q "https://packages.riot.im/debian/ default main"; then
+  echo "deb [signed-by=/usr/share/keyrings/riot-im-archive-keyring.gpg] https://packages.riot.im/debian/ default main" | sudo tee /etc/apt/sources.list.d/riot-im.list
+  sudo apt update
+fi
+sudo apt-get update && sudo apt-get install element-desktop
 
 echo -e "${BLUE}Adding .gitconfig$NC"
 sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"$USER"/.gitconfig
