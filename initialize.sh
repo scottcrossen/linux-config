@@ -317,7 +317,7 @@ if [ ! -f /etc/apt/sources.list.d/google-cloud-sdk.list ]; then
   echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
   curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key --keyring /usr/share/keyrings/cloud.google.gpg add -
 fi
-sudo apt-get update && sudo apt-get install google-cloud-sdk
+sudo apt-get -qq update && sudo apt-get -qq install -y google-cloud-sdk
 
 echo -e "${BLUE}Installing aws$NC"
 if [ -z "$(which aws)" ]; then
@@ -355,7 +355,7 @@ if [[ ! -f /etc/apt/sources.list.d/riot-im.list ]] || ! cat /etc/apt/sources.lis
   echo "deb [signed-by=/usr/share/keyrings/riot-im-archive-keyring.gpg] https://packages.riot.im/debian/ default main" | sudo tee /etc/apt/sources.list.d/riot-im.list
   sudo apt update
 fi
-sudo apt-get update && sudo apt-get install element-desktop
+sudo apt-get -qq update && sudo apt-get -qq install -y element-desktop
 
 echo -e "${BLUE}Adding .gitconfig$NC"
 sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"$USER"/.gitconfig
