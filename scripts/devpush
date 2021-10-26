@@ -13,11 +13,11 @@ if [[ "$(git rev-parse --abbrev-ref HEAD)" != "$USER"-dev ]]; then
   git checkout -b "$USER"-dev
 fi
 git fetch
-if git show origin/"$USER"-dev:kubernetes/namespaces/dev/"$USER"-dev/image-tags.yaml 2> /dev/null > /dev/null; then
-  git checkout -m origin/"$USER"-dev "$GIT_ROOT"/kubernetes/namespaces/dev/"$USER"-dev/image-tags.yaml
-  UNADDED_FILES="$(echo -e "$UNADDED_FILES\n$GIT_ROOT/kubernetes/namespaces/dev/$USER-dev/image-tags.yaml")"
-fi
 if [[ ! -z "$UNADDED_FILES" ]]; then
+  if git show origin/"$USER"-dev:kubernetes/namespaces/dev/"$USER"-dev/image-tags.yaml 2> /dev/null > /dev/null; then
+    git checkout -m origin/"$USER"-dev "$GIT_ROOT"/kubernetes/namespaces/dev/"$USER"-dev/image-tags.yaml
+    UNADDED_FILES="$(echo -e "$UNADDED_FILES\n$GIT_ROOT/kubernetes/namespaces/dev/$USER-dev/image-tags.yaml")"
+  fi
   git add .
   git commit -m "temp commit"
 fi
