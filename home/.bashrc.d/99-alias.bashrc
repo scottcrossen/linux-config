@@ -43,3 +43,7 @@ function pushfork {
         echo "Not a git repository"
     fi
 }
+
+alias showcert='openssl x509 -text -noout -in'
+alias subiss='showcert /dev/stdin | sed -n '"'"'/Issuer:/,/Subject:/p'"'"' | sed '"'"'s/^ \{8\}//g'"'"
+alias recentdl='echo ~/Downloads/"$(ls -t ~/Downloads/ | head  -n 1)"'

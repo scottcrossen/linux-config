@@ -185,9 +185,9 @@ if [ ! -f /etc/apt/sources.list.d/kubernetes.list ] || ! grep -q "xenial" /etc/a
 fi
 sudo apt-get -qq update > /dev/null && sudo apt-get -qq install -y kubectl > /dev/null
 
-echo -e "${BLUE}Installing concourse fly CLI"
-curl -sSL https://api.github.com/repos/concourse/concourse/releases/latest | grep "browser_download_url.*fly.*$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCH.tgz\"" | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo fly.tgz
-sudo tar -C /usr/local/bin -zxvf fly.tgz > /dev/null
+# echo -e "${BLUE}Installing concourse fly CLI"
+# curl -sSL https://api.github.com/repos/concourse/concourse/releases/latest | grep "browser_download_url.*fly.*$(uname -s | tr '[:upper:]' '[:lower:]')-$ARCH.tgz\"" | cut -d : -f 2,3 | tr -d "\" " | xargs curl -sSLo fly.tgz
+# sudo tar -C /usr/local/bin -zxvf fly.tgz > /dev/null
 
 echo -e "${BLUE}Installing Minikube$NC"
 curl -sSLo minikube https://storage.googleapis.com/minikube/releases/latest/minikube-linux-$ARCH \
@@ -338,11 +338,12 @@ if [ ! -d /home/"$USER"/.nvm ]; then
   nvm install --lts && \
   nvm use --lts && \
   npm install --global yarn"
+  sudo -H -u "$USER" bash -c "npm install --global yarn"
 fi
 
 echo -e "${BLUE}Installing krew$NC"
 sudo -H -u "$USER" bash -c 'cd "$(mktemp -d)" && export PATH="${PATH}:${HOME}/.krew/bin" && \
-curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" && \
+curl -fsSLO "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew.tar.gz" || curl -fsSLo krew.tar.gz "https://github.com/kubernetes-sigs/krew/releases/latest/download/krew-$(uname | tr "[:upper:]" "[:lower:]")_$(uname -m | sed -e "s/x86_64/amd64/" -e "s/arm.*$/arm/").tar.gz" && \
 tar zxvf krew.tar.gz && KREW=./krew-"$(uname | tr "[:upper:]" "[:lower:]")"_"$(uname -m | sed -e "s/x86_64/amd64/" -e "s/arm.*$/arm/")" && \
 "$KREW" install krew && \
 "$KREW" install ctx && \
