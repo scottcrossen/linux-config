@@ -358,6 +358,19 @@ if [[ ! -f /etc/apt/sources.list.d/riot-im.list ]] || ! cat /etc/apt/sources.lis
 fi
 sudo apt-get -qq update && sudo apt-get -qq install -y element-desktop
 
+echo -e "${BLUE}Installing vim stuff$NC"
+if ! grep -q "neovim" /etc/apt/sources.list; then
+  sudo add-apt-repository ppa:neovim-ppa/stable
+fi
+sudo apt-get -qq update && sudo apt-get -qq install -y neovim python-dev python3-dev python3-pip python3-neovim
+sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
+sudo update-alternatives --config vi --skip-auto
+sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
+sudo update-alternatives --config vim --skip-auto
+sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
+sudo update-alternatives --config editor --skip-auto
+curl vimfiles.luan.sh/install | bash
+
 echo -e "${BLUE}Adding .gitconfig$NC"
 sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"$USER"/.gitconfig
 sudo chown "$USER":"$USER" /home/"$USER"/.gitconfig
