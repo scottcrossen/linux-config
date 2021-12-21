@@ -301,6 +301,7 @@ if [ ! -d /home/"$USER"/.tfenv ]; then
   sudo mkdir -p /home/"$USER"/.tfenv
   sudo git clone https://github.com/tfutils/tfenv.git /home/"$USER"/.tfenv -q
   sudo ln -s /home/"$USER"/.tfenv/bin/* /usr/local/bin
+  sudo -H -u "$USER" bash -c "tfenv install latest && tfenv use latest"
 fi
 
 if [ "$HAS_RUBY" = "true" ]; then
