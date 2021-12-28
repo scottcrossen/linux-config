@@ -140,6 +140,7 @@ sudo apt-get -qq install -y \
   ykcs11 \
   sshpass \
   firefox-esr \
+  python3-pip \
   jq > /dev/null
 
 if [ "$HEADLESS" != "true" ]; then
@@ -152,7 +153,7 @@ sudo apt-get -qq install -y ./google-chrome-stable_current_$ARCH.deb > /dev/null
 
 echo -e "${BLUE}Installing Git$NC"
 sudo apt-get -qq install git > /dev/null
-if [ ! -f /home/"$USER"/.ssh/id_rsa ]; then
+if [[ ! -f /home/"$USER"/.ssh/id_rsa ]]; then
   echo "Creating ssh key"
   sudo su -c "ssh-keygen -f /home/$USER/.ssh/id_rsa -q -N ''" "$USER"
   echo "TODO: Remember to add public ssh key to GitHub/BitBucket"
@@ -370,7 +371,14 @@ sudo update-alternatives --install /usr/bin/vim vim /usr/bin/nvim 60
 sudo update-alternatives --config vim --skip-auto
 sudo update-alternatives --install /usr/bin/editor editor /usr/bin/nvim 60
 sudo update-alternatives --config editor --skip-auto
-curl vimfiles.luan.sh/install | bash
+if [[ ! -d /home/"$USER"/.vim ]]; then
+  sudo -H -u "$USER" bash -c "echo '' | curl vimfiles.luan.sh/install | bash"
+else
+  sudo -H -u "$USER" bash -c "echo '' | /home/"$USER"/.vim/bin/update"
+fi
+
+echo -e "${BLUE}Installing kustomize$NC"
+sudo -H -u "$USER" bash -c 'go get sigs.k8s.io/kustomize/kustomize/v3@3.8.0'
 
 echo -e "${BLUE}Adding .gitconfig$NC"
 sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"$USER"/.gitconfig
