@@ -153,7 +153,7 @@ sudo apt-get -qq install -y ./google-chrome-stable_current_$ARCH.deb > /dev/null
 
 echo -e "${BLUE}Installing Git$NC"
 sudo apt-get -qq install git > /dev/null
-if [[ ! -f /home/"$USER"/.ssh/id_rsa ]]; then
+if ! sudo ls -al /home/"$USER"/.ssh/id_rsa; then
   echo "Creating ssh key"
   sudo su -c "ssh-keygen -f /home/$USER/.ssh/id_rsa -q -N ''" "$USER"
   echo "TODO: Remember to add public ssh key to GitHub/BitBucket"
