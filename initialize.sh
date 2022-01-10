@@ -378,7 +378,7 @@ else
 fi
 
 echo -e "${BLUE}Installing kustomize$NC"
-sudo -H -u "$USER" bash -c 'go get sigs.k8s.io/kustomize/kustomize/v3@3.8.0'
+sudo -H -u "$USER" bash -c 'mkdir -p /home/$USER/go/bin; cd "$(mktemp -d)"; GOBIN=/home/$USER/go GO111MODULE=on /usr/local/go/bin/go install sigs.k8s.io/kustomize/kustomize/v3@latest; cd -; cp /home/$USER/go/kustomize /home/$USER/go/bin/kustomize'
 
 echo -e "${BLUE}Adding .gitconfig$NC"
 sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"$USER"/.gitconfig
