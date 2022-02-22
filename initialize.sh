@@ -300,6 +300,7 @@ sudo apt-get -qq install -y protobuf-compiler
 echo -e "${BLUE}Installing Terraform$NC"
 if [ ! -d /home/"$USER"/.tfenv ]; then
   sudo mkdir -p /home/"$USER"/.tfenv
+  sudo chown -R "$USER":"$USER" /home/"$USER"/.tfenv
   sudo git clone https://github.com/tfutils/tfenv.git /home/"$USER"/.tfenv -q
   sudo ln -s /home/"$USER"/.tfenv/bin/* /usr/local/bin
   sudo -H -u "$USER" bash -c "tfenv install latest && tfenv use latest"
@@ -378,7 +379,7 @@ else
 fi
 
 echo -e "${BLUE}Installing kustomize$NC"
-sudo -H -u "$USER" bash -c 'mkdir -p /home/$USER/go/bin; cd "$(mktemp -d)"; GOBIN=/home/$USER/go GO111MODULE=on /usr/local/go/bin/go install sigs.k8s.io/kustomize/kustomize/v3@latest; cd -; cp /home/$USER/go/kustomize /home/$USER/go/bin/kustomize'
+sudo -H -u "$USER" bash -c 'mkdir -p /home/$USER/go/bin; cd "$(mktemp -d)"; curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash; cp kustomize /home/$USER/go/bin/kustomize; cd -'
 
 echo -e "${BLUE}Adding .gitconfig$NC"
 sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"$USER"/.gitconfig
