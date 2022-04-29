@@ -8,8 +8,8 @@ USER=${1:-$USER}
 USER_FULLNAME=$2
 USER_EMAIL=$3
 ARCH=""
-ETHERNET_INTERFACE=$(ip link show | grep -o 'en[^: ]\+')
-WIFI_INTERFACE=$(ip link show | grep -o 'wlp[^: ]\+')
+ETHERNET_INTERFACE=$(ip link show | grep -o '[0-9]:\sen[^:]\+' | grep -o 'en[^:]\+')
+WIFI_INTERFACE=$(ip link show | grep -o '[0-9]:\swlp[^: ]\+' | grep -o 'wlp[^: ]\+')
 BLUE='\033[0;34m'
 NC='\033[0m'
 DISTRIBUTION="$(lsb_release -a | grep --color=never "Distributor" | sed 's/^Distributor\sID:\s*\(\S*\)/\1/g') | awk '{print tolower($0)}'"
