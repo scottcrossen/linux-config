@@ -69,6 +69,7 @@ groupadd chrome-remote-desktop > /dev/null 2> /dev/null
 sudo usermod -aG libvert $USER > /dev/null 2> /dev/null
 sudo usermod -aG sudo $USER > /dev/null 2> /dev/null
 sudo usermod -aG chrome-remote-desktop $USER > /dev/null 2> /dev/null
+sudo susermod --shell /bin/bash "$USER"
 if [ "$(sudo passwd --status "$USER" | awk '{print $2}')" != "P" ]; then
   echo -e "${BLUE}Setting user password$NC"
   sudo passwd "$USER"
@@ -303,7 +304,7 @@ if [ ! -d /home/"$USER"/.tfenv ]; then
   sudo chown -R "$USER":"$USER" /home/"$USER"/.tfenv
   sudo git clone https://github.com/tfutils/tfenv.git /home/"$USER"/.tfenv -q
   sudo ln -s /home/"$USER"/.tfenv/bin/* /usr/local/bin
-  sudo -H -u "$USER" bash -c "tfenv install latest && tfenv use latest"
+  sudo -H -u "$USER" bash -c "tfenv install latest && tfenv use $(cat /home/$USER/.tfenv/version)"
 fi
 
 if [ "$HAS_RUBY" = "true" ]; then
@@ -362,7 +363,7 @@ fi
 sudo apt-get -qq update && sudo apt-get -qq install -y element-desktop
 
 echo -e "${BLUE}Installing vim stuff$NC"
-if ! grep -q "neovim" /etc/apt/sources.list; then
+if ! grep -q "neovim" /etc/apt/sources.list && [[ "$DISTRIBUTION" != "debian" ]]; then
   sudo add-apt-repository ppa:neovim-ppa/stable
 fi
 sudo apt-get -qq update && sudo apt-get -qq install -y neovim python-dev python3-dev python3-pip python3-neovim
