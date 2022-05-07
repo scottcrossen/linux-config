@@ -69,7 +69,7 @@ groupadd chrome-remote-desktop > /dev/null 2> /dev/null
 sudo usermod -aG libvert $USER > /dev/null 2> /dev/null
 sudo usermod -aG sudo $USER > /dev/null 2> /dev/null
 sudo usermod -aG chrome-remote-desktop $USER > /dev/null 2> /dev/null
-sudo susermod --shell /bin/bash "$USER"
+sudo usermod --shell /bin/bash "$USER"
 if [ "$(sudo passwd --status "$USER" | awk '{print $2}')" != "P" ]; then
   echo -e "${BLUE}Setting user password$NC"
   sudo passwd "$USER"
