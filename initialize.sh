@@ -12,7 +12,7 @@ ETHERNET_INTERFACE=$(ip link show | grep -o '[0-9]:\sen[^:]\+' | grep -o 'en[^:]
 WIFI_INTERFACE=$(ip link show | grep -o '[0-9]:\swlp[^: ]\+' | grep -o 'wlp[^: ]\+')
 BLUE='\033[0;34m'
 NC='\033[0m'
-DISTRIBUTION="$(lsb_release -a | grep --color=never "Distributor" | sed 's/^Distributor\sID:\s*\(\S*\)/\1/g') | awk '{print tolower($0)}'"
+DISTRIBUTION="$(lsb_release -a | grep --color=never "Distributor" | sed 's/^Distributor\sID:\s*\(\S*\)/\1/g' | awk '{print tolower($0)}')"
 cd $TEMP_DIR
 
 if [ -z "$USER" ] || [ -z "$USER_FULLNAME" ] || [ -z "$USER_EMAIL" ]; then
@@ -304,7 +304,7 @@ if [ ! -d /home/"$USER"/.tfenv ]; then
   sudo chown -R "$USER":"$USER" /home/"$USER"/.tfenv
   sudo git clone https://github.com/tfutils/tfenv.git /home/"$USER"/.tfenv -q
   sudo ln -s /home/"$USER"/.tfenv/bin/* /usr/local/bin
-  sudo -H -u "$USER" bash -c "tfenv install latest && tfenv use $(cat /home/$USER/.tfenv/version)"
+  sudo -H -u "$USER" bash -c "tfenv install latest && tfenv use \$(cat /home/$USER/.tfenv/version)"
 fi
 
 if [ "$HAS_RUBY" = "true" ]; then
@@ -364,7 +364,7 @@ sudo apt-get -qq update && sudo apt-get -qq install -y element-desktop
 
 echo -e "${BLUE}Installing vim stuff$NC"
 if ! grep -q "neovim" /etc/apt/sources.list && [[ "$DISTRIBUTION" != "debian" ]]; then
-  sudo add-apt-repository ppa:neovim-ppa/stable
+  sudo add-apt-repository -y ppa:neovim-ppa/stable
 fi
 sudo apt-get -qq update && sudo apt-get -qq install -y neovim python-dev python3-dev python3-pip python3-neovim
 sudo update-alternatives --install /usr/bin/vi vi /usr/bin/nvim 60
