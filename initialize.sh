@@ -379,6 +379,13 @@ else
   sudo -H -u "$USER" bash -c "echo '' | /home/"$USER"/.vim/bin/update"
 fi
 
+echo -e "${BLUE}Installing warp-cli$NC"
+sudo apt --fix-broken install
+if [[ -z "$(which warp-cli)" ]]; then
+  curl -sSLo warp.deb https://pkg.cloudflareclient.com/uploads/cloudflare_warp_2022_5_346_1_amd64_ba8aeeeb51.deb
+  sudo dpkg -i warp.deb
+fi
+
 echo -e "${BLUE}Installing kustomize$NC"
 sudo -H -u "$USER" bash -c 'mkdir -p /home/$USER/go/bin; cd "$(mktemp -d)"; curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash; cp kustomize /home/$USER/go/bin/kustomize; cd -'
 
