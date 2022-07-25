@@ -329,6 +329,15 @@ if [ -z "$(which aws)" ]; then
   unzip awscliv2.zip
   sudo ./aws/install
 fi
+echo -e "${BLUE}Installing Amazon instance connect$NC"
+sudo -H -u "$USER" bash -c "pip install ec2instanceconnectcli"
+
+echo -e "${BLUE}Installing warp-cli$NC"
+sudo apt --fix-broken install
+if [[ -z "$(which warp-cli)" ]]; then
+  curl -sSLo warp.deb https://pkg.cloudflareclient.com/uploads/cloudflare_warp_2022_5_346_1_amd64_ba8aeeeb51.deb
+  sudo dpkg -i warp.deb
+fi
 
 echo -e "${BLUE}Chowning home directory to $USER$NC"
 sudo chown -R "$USER":"$USER" /home/"$USER"
@@ -379,18 +388,14 @@ else
   sudo -H -u "$USER" bash -c "echo '' | /home/"$USER"/.vim/bin/update"
 fi
 
-echo -e "${BLUE}Installing warp-cli$NC"
-sudo apt --fix-broken install
-if [[ -z "$(which warp-cli)" ]]; then
-  curl -sSLo warp.deb https://pkg.cloudflareclient.com/uploads/cloudflare_warp_2022_5_346_1_amd64_ba8aeeeb51.deb
-  sudo dpkg -i warp.deb
-fi
-
 echo -e "${BLUE}Installing kustomize$NC"
 sudo -H -u "$USER" bash -c 'mkdir -p /home/$USER/go/bin; cd "$(mktemp -d)"; curl -s "https://raw.githubusercontent.com/kubernetes-sigs/kustomize/master/hack/install_kustomize.sh"  | bash; cp kustomize /home/$USER/go/bin/kustomize; cd -'
 
 echo -e "${BLUE}Adding .gitconfig$NC"
 sudo cp -r "$ARTIFACT_DIR"/home/.gitconfig /home/"$USER"/.gitconfig
 sudo chown "$USER":"$USER" /home/"$USER"/.gitconfig
+
+echo -e "${BLUE}Attempting fix for terraform installation$NC"
+sudo -H -u "$USER" bash -c "tfenv install latest && tfenv use \$(cat /home/$USER/.tfenv/version)"
 
 echo -e "${BLUE}Finished$NC"
