@@ -213,7 +213,7 @@ curl -sSL https://api.github.com/repos/roboll/helmfile/releases/latest | grep "b
 sudo chmod +x helmfile
 sudo install helmfile /usr/local/bin/
 sudo -H -u "$USER" bash -c 'helm plugin install https://github.com/databus23/helm-diff > /dev/null 2> /dev/null'
-sudo -H -u "$USER" bash -c 'helm plugin install https://github.com/jkroepke/helm-secrets > /dev/null 2> /dev/null'
+sudo -H -u "$USER" bash -c 'helm plugin install https://github.com/jkroepke/helm-secrets --version 3.15.0 > /dev/null 2> /dev/null'
 
 echo -e "${BLUE}Installing HashiCorp Vault$NC"
 curl -fsSL https://apt.releases.hashicorp.com/gpg | sudo apt-key add - > /dev/null 2> /dev/null
