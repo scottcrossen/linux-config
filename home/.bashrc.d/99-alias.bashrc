@@ -47,3 +47,17 @@ function pushfork {
 alias showcert='openssl x509 -text -noout -in'
 alias subiss='showcert /dev/stdin | sed -n '"'"'/Issuer:/,/Subject:/p'"'"' | sed '"'"'s/^ \{8\}//g'"'"
 alias recentdl='echo ~/Downloads/"$(ls -t ~/Downloads/ | head  -n 1)"'
+function formatcert {
+  TEMP_DIR="$(mktemp -d)"
+  touch "$TEMP_DIR"/remaining.crt "$TEMP_DIR"/current.crt
+  cp "/dev/stdin" "$TEMP_DIR"/remaining.crt
+  COUNT=0
+  while grep -q "\-----END CERTIFICATE-----" "$TEMP_DIR"/remaining.crt; do
+    COUNT="$((COUNT+1))"
+    sed -i '/-----BEGIN CERTIFICATE-----/,$!d' "$TEMP_DIR"/remaining.crt
+    sed '/-----END CERTIFICATE-----/q' "$TEMP_DIR"/remaining.crt > "$TEMP_DIR"/current.crt
+    sed -i '1,/-----END CERTIFICATE-----/d' "$TEMP_DIR"/remaining.crt
+    cat <(cat "$TEMP_DIR"/current.crt | subiss) <(cat "$TEMP_DIR"/current.crt)
+  done
+  rm "$TEMP_DIR"/remaining.crt "$TEMP_DIR"/current.crt
+}

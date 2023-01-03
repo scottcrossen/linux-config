@@ -169,15 +169,18 @@ bindsym $mod+c exec firefox
 
 exec --no-startup-id xset s off
 exec --no-startup-id i3-msg 'workspace 3; exec i3-sensible-terminal; workspace 1'
+exec --no-startup-id google-chrome-stable --new-window --app=https://web.whatsapp.com
 # exec --no-startup-id google-chrome-stable --new-window --app=https://music.youtube.com/
+# exec --no-startup-id google-chrome-stable --profile-directory=Default --app-id=cinhimbnkkaeohfgghhklpknlkffjgod
 # exec --no-startup-id google-chrome-stable --new-window --app=https://mail.google.com/mail/u/0/#inbox
 # exec --no-startup-id google-chrome-stable --new-window --app=https://element.scottcrossen.com/
-exec --no-startup-id element-desktop
+# exec --no-startup-id element-desktop
 # exec --no-startup-id google-chrome-stable --new-window
 exec --no-startup-id firefox
 exec --no-startup-id code
 # assign [class="Google-chrome" instance="music.youtube.com"] 7
 # assign [class="Google-chrome" instance="mail.google.com__mail_u_0"] 8
 # assign [class="Google-chrome" instance="app.element.io"] 8
-assign [class="Element" instance="element"] 8
+assign [class="Google-chrome" instance="web.whatsapp.com"] 8
+# assign [class="Element" instance="element"] 8
 assign [class="Code"] 2
